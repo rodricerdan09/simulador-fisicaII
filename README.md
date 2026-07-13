@@ -1,174 +1,121 @@
-# Simulador Físico Universitario
+# Simulador de la Unidad 12: Interferencia, de la catedra Física II de la UTN FRRE
 
-Aplicación web interactiva para el dictado de Física II (Óptica) en carreras de
-Ingeniería y Ciencias Exactas. Permite a los estudiantes explorar fenómenos de
-interferencia, difracción, polarización y espectro, mientras los docentes
-visualizan métricas de uso por carrera y comisión.
-
-## Demo
-
-- Despliegue de referencia: [simulador-fisica-ii.vercel.app](https://simulador-fisica-ii.vercel.app) *(placeholder)*
-- Capturas de pantalla: ver carpeta `/docs/screenshots` *(placeholder)*
+Aplicación web interactiva para el dictado de Física II (Óptica / Interferencia de la Luz) en carreras de Ingeniería y Ciencias Exactas de la Universidad Tecnológica Nacional. Permite a los estudiantes explorar fenómenos ópticos reales con representaciones físicas de alta fidelidad (Canvas/SVG), y a los docentes analizar métricas de visitas agrupadas por carrera y comisión mediante un panel dedicado.
 
 ## Stack tecnológico
 
 - **Framework:** [Next.js 14.2](https://nextjs.org/) (App Router)
 - **Lenguaje:** TypeScript 5.5
 - **Estilos:** Tailwind CSS 3.4 + [shadcn/ui](https://ui.shadcn.com/) (base-nova)
-- **Componentes base:** Radix UI + `@base-ui/react`
-- **Backend / Auth:** [Supabase](https://supabase.com/) (Auth + Postgres)
+- **Componentes base:** `@base-ui/react` (Base UI) + Radix UI
+- **Backend / Auth:** [Supabase](https://supabase.com/) (Auth + Postgres con Row Level Security)
 - **Gráficos:** [Recharts](https://recharts.org/)
-- **Renderizado matemático:** [KaTeX](https://katex.org/) via `react-katex`
+- **Renderizado matemático:** [KaTeX](https://katex.org/)
 - **Iconos:** Lucide React
 
-## Estructura del proyecto
+---
 
-```text
-src/
-  app/              # Rutas de Next.js (App Router)
-    (app)/          # Layout con AppShell, sidebar y drawer
-    (auth)/         # Login y registro
-    api/visits/     # Endpoint para registrar visitas
-  components/
-    ui/             # Componentes de shadcn/ui
-    layout/         # AppShell, sidebar, navegación, footer
-    auth/           # Formularios de autenticación
-    exercise/       # Motor de simulaciones
-    dashboard/      # Panel docente
-    teoria/         # Componentes de la página teórica
-  lib/              # Clientes Supabase, catálogos, utilidades físicas
-  hooks/            # useUser, useVisit, useDebouncedParam
-  types/            # Tipos TypeScript
-  constants/        # Registro de ejercicios
-supabase/
-  migrations/       # Esquema, RLS y triggers
-  seed.sql          # Datos iniciales
-```
+## Características principales
+
+- 🔐 **Autenticación académica unificada:** Registro diferenciado para Alumnos (con legajo, carrera y comisión obligatorios) y Profesores (con código de invitación obligatorio).
+- 🔬 **Cinco simulaciones interactivas de alta fidelidad:**
+  1. **Doble Rendija:** Simulación con frentes de onda interactivos y cálculo de la longitud de onda y espaciado de franjas.
+  2. **Comparación de Espectros:** Comparación paralela de frentes de onda y franjas en pantalla para dos longitudes de onda distintas en doble rendija.
+  3. **Mínimos de Interferencia:** Determinación de longitud de onda basada en el espaciado de franjas oscuras consecutivas.
+  4. **Película Delgada:** Análisis del espesor de películas de jabón (<Formula math="n = 1.33" />) con rayos de reflexión, refracción e inversión de fase de <Formula math="\pi" />.
+  5. **Distribución de Intensidad:** Gráficos de intensidad continuos <Formula math="I = I_0 \cos^2(\theta)" /> con Recharts (máximos y mínimos marcados) y canvas de patrón físico interactivo.
+- 🧪 **Laboratorios interactivos:** Sección preparada para futuros laboratorios virtuales.
+- 📈 **Seguimiento analítico de visitas:** Cada ejercicio tiene un contador de visitas que se registra en background de forma no bloqueante (con debounce de sesión).
+- 👨‍🏫 **Panel Docente avanzado:** Vista para profesores con listado de alumnos matriculados por carrera/comisión y gráficos de visitas agrupados.
+- 📚 **Teoría interactiva completa:** 5 tarjetas desplegables alineadas con cada simulación, integrando developments matemáticos detallados en KaTeX y videos embebidos de YouTube.
+
+---
 
 ## Requisitos previos
 
-- Node.js 18+
-- Cuenta de Supabase (puede ser local con la CLI o un proyecto en la nube)
-- Variables de entorno configuradas en `.env.local`
+- Node.js 18+ o superior
+- Cuenta de Supabase (cloud o local)
+- Archivo `.env.local` configurado con tus credenciales
+
+---
 
 ## Configuración inicial
 
-1. Clonar el repositorio e instalar dependencias:
-
+1. **Instalar dependencias:**
    ```bash
    npm install
    ```
 
-2. Copiar el archivo de variables de entorno:
-
+2. **Crear archivo de entorno:**
+   Copia el archivo de ejemplo y completa las variables con tus propias claves:
    ```bash
    cp .env.local.example .env.local
    ```
 
-3. Completar `.env.local` con los datos de tu proyecto Supabase:
+   Las variables necesarias (sin valores explícitos en este documento) son:
+   - `NEXT_PUBLIC_SUPABASE_URL` (URL de tu proyecto Supabase)
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (Clave pública anon de Supabase)
+   - `NEXT_PUBLIC_INVITATION_CODE_PROFESOR` (Código secreto requerido para registrar cuentas de profesores)
+   - `NEXT_PUBLIC_SITE_URL` (URL de tu deploy, por defecto http://localhost:3000 para local)
 
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<anon-key>
-   INVITATION_CODE_PROFESOR=<código-secreto>
-   NEXT_PUBLIC_SITE_URL=http://localhost:3000
-   ```
-
-   - `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` se obtienen
-     en **Project Settings > API** de Supabase.
-   - `INVITATION_CODE_PROFESOR` es un valor arbitrario que se usa para validar
-     el registro de cuentas docentes (las cuentas de alumno no lo requieren).
-   - `NEXT_PUBLIC_SITE_URL` debe coincidir con el origen de tu despliegue para
-     que los callbacks de OAuth funcionen correctamente.
-
-4. Aplicar las migraciones en Supabase:
-
+3. **Configurar Base de Datos (Supabase):**
+   Copia y ejecuta en el **SQL Editor** de Supabase las migraciones ubicadas en `supabase/migrations/` en orden cronológico, o utiliza la Supabase CLI:
    ```bash
-   supabase link
+   supabase link --project-ref <tu-referencia>
    supabase db push
    ```
 
-   O ejecutar manualmente los archivos de `supabase/migrations/` en el SQL
-   Editor de Supabase.
+4. **(Opcional) Poblar base de datos con datos Seed:**
+   Ejecuta el script `supabase/seed.sql` para crear usuarios de prueba y datos de métricas ficticias.
+   - **Profesor de prueba:** `profesor@example.com` / `password123`
+   - **Alumno de prueba:** `alumno1@example.com` / `password123`
 
-5. (Opcional) Poblar la base de datos con el usuario docente y alumnos de
-   ejemplo:
-
+5. **Iniciar servidor de desarrollo:**
    ```bash
-   psql $SUPABASE_DB_URL -f supabase/seed.sql
+   npm run dev
    ```
+   Abre [http://localhost:3000](http://localhost:3000) en tu navegador para ver la aplicación.
 
-   El seed crea un docente con email `profesor@example.com` y contraseña
-   `password123`, además de varios alumnos de prueba. Ver el archivo para los
-   datos exactos.
+---
 
 ## Scripts disponibles
 
-| Script           | Descripción                                      |
-|------------------|--------------------------------------------------|
-| `npm run dev`    | Inicia el servidor de desarrollo en `localhost:3000` |
-| `npm run build`  | Construye la aplicación para producción          |
-| `npm run start`  | Inicia la aplicación en modo producción          |
-| `npm run lint`   | Ejecuta ESLint sobre el proyecto                 |
+| Script | Descripción |
+|---|---|
+| `npm run dev` | Inicia el entorno de desarrollo |
+| `npm run build` | Compila la aplicación optimizada para producción |
+| `npm run start` | Inicia la aplicación en modo producción |
+| `npm run lint` | Ejecuta chequeos de sintaxis con ESLint |
 
-Además se recomienda correr el chequeo de tipos antes de commitear:
-
+Antes de realizar despliegues o commits, se recomienda correr el chequeo de tipos:
 ```bash
 npx tsc --noEmit
 ```
 
-## Testing
+---
 
-> TODO: Agregar suite de tests automatizados.
->
-> Configuración recomendada:
-> - Tests unitarios/de componentes: [Vitest](https://vitest.dev/) + React Testing Library
-> - Tests end-to-end: [Playwright](https://playwright.dev/)
->
-> Hasta que haya tests, ejecutar estos pasos de verificación manual antes de cada release:
-> 1. `npx tsc --noEmit` — chequeo de tipos
-> 2. `npm run build` — build de producción
-> 3. `npm run lint` — ESLint
-> 4. Iniciar sesión como alumno y visitar cada ejercicio; confirmar que los simuladores rendericen y los resultados se actualicen.
-> 5. Iniciar sesión como profesor y abrir `/dashboard`; confirmar que filtros, listado de alumnos y gráfico de visitas carguen.
-> 6. Verificar que la página `/teoria` renderice todas las fórmulas KaTeX sin warnings en el build.
+## Seguridad y Row Level Security (RLS)
 
-## Funcionalidades principales
+El proyecto implementa políticas estrictas de seguridad RLS a nivel de base de datos para garantizar la privacidad académica:
+- **Profiles:** Un alumno solo puede consultar su propio perfil (`auth.uid() = id`). Los docentes pueden consultar todos los perfiles de los alumnos.
+- **Page Visits:** Un alumno solo puede registrar visitas vinculadas a su propio ID. Un docente puede consultar las analíticas agregadas de todas las visitas para generar estadísticas en el gráfico.
+- **Contador Público:** Se utiliza una vista de agregación SQL segura (`page_visit_counts`) para que los alumnos vean el contador de popularidad de cada ejercicio sin necesidad de acceder a los registros de visitas individuales.
 
-- **Autentación académica:** registro con carrera, comisión, legajo y código de
-  invitación para docentes. Login con email/contraseña.
-- **Cinco simulaciones interactivas:** doble rendija, película delgada,
-  difracción, polarización y espectro. Cada una expone parámetros ajustables,
-  resultados en tiempo real y panel teórico con fórmulas en KaTeX.
-- **Seguimiento de visitas:** cada carga de ejercicio registra una fila en
-  `page_visits` de forma fire-and-forget, sin bloquear la interfaz.
-- **Panel docente:** solo accesible para usuarios con rol `profesor`. Muestra
-  listado filtrable de alumnos y un gráfico de visitas agrupadas por carrera y
-  comisión.
-- **Teoría general:** página con secciones colapsables, videos de YouTube y
-  desarrollos matemáticos paso a paso.
+---
 
-## Seguridad y RLS
+## Testing y Verificación Manual
 
-El proyecto usa Row Level Security (RLS) en Supabase:
+> TODO: Integrar tests de componentes con Vitest y pruebas de integración con Playwright.
 
-- Un alumno solo puede leer su propio perfil.
-- Un docente puede leer todos los perfiles y todas las visitas.
-- Las visitas solo pueden ser insertadas por el usuario autenticado que las
-  genera.
-- El contador público de visitas se expone a través de la vista
-  `page_visit_counts` para no revelar datos individuales.
+Pasos recomendados para validación manual de entregas:
+1. Confirmar compilación exitosa: `npx tsc --noEmit` y `npm run build`.
+2. Verificar el registro como Alumno y confirmar que solo muestra campos académicos relevantes.
+3. Verificar el registro como Profesor, confirmando que requiere el código de invitación correspondiente.
+4. Interactuar con las 5 simulaciones; confirmar que las ecuaciones KaTeX se visualizan al ancho completo en Teoría, y que los sliders no se superponen en mobile ni impiden la entrada manual de texto.
+5. Iniciar sesión como docente y verificar que los filtros por carrera (ISI, IEM, IQ) y comisión funcionen en el listado y el gráfico de Recharts.
 
-## Capturas de pantalla
-
-> Agregar imágenes en `/docs/screenshots/` y enlazarlas aquí.
->
-> - Login
-> - Listado de ejercicios
-> - Simulación de doble rendija
-> - Panel docente
-> - Página de teoría
+---
 
 ## Licencia
 
-MIT
+Este proyecto está bajo la licencia MIT.
