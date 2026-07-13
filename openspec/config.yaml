@@ -1,0 +1,13 @@
+version: 1.0
+project: simulador-final
+persistence:
+  mode: hybrid
+stack:
+  framework: Next.js 14.2 (App Router)
+  language: TypeScript
+  styling: Tailwind CSS + shadcn/ui
+  database: Supabase
+  other: Recharts
+testing:
+  strict_tdd: false
+  runners: []
