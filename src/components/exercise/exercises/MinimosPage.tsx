@@ -12,9 +12,23 @@ import { Formula } from "@/lib/katex/render";
 export function MinimosPage({ exercise }: { exercise: Exercise }) {
   const [slitDistance, setSlitDistance] = useState(2.0);
   const [screenDistance, setScreenDistance] = useState(0.5);
-  const [fringeSpacing, setFringeSpacing] = useState(0.6);
+  const [lambda, setLambda] = useState(550);
 
-  const results = computeMinimos(slitDistance, screenDistance, fringeSpacing);
+  // Calcular Δy a partir de λ, d, L
+  const lambdaM = lambda * 1e-9;
+  const dM = slitDistance * 1e-3;
+  const LM = screenDistance;
+  const fringeSpacingM = dM === 0 ? 0 : (lambdaM * LM) / dM;
+  const fringeSpacingMm = fringeSpacingM * 1000;
+
+  const results = [
+    { label: "Separación entre rendijas (d)", value: slitDistance, unit: "mm", precision: 1 },
+    { label: "Distancia a la pantalla (L)", value: screenDistance, unit: "m", precision: 1 },
+    { label: "Longitud de onda (λ)", value: lambdaM, unit: "m", precision: 4, scientific: true },
+    { label: "Longitud de onda (λ)", value: lambda, unit: "nm", precision: 0 },
+    { label: "Separación entre mínimos (Δy)", value: fringeSpacingM, unit: "m", precision: 4, scientific: true },
+    { label: "Separación entre mínimos (Δy)", value: fringeSpacingMm, unit: "mm", precision: 2 },
+  ];
 
   return (
     <ExerciseModule
@@ -40,13 +54,13 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
             onChange={setScreenDistance}
           />
           <ParameterControl
-            label="Separación entre mínimos (Δy)"
-            value={fringeSpacing}
-            min={0.1}
-            max={2.0}
-            step={0.1}
-            unit="mm"
-            onChange={setFringeSpacing}
+            label="Longitud de onda (λ)"
+            value={lambda}
+            min={380}
+            max={750}
+            step={5}
+            unit="nm"
+            onChange={setLambda}
           />
         </>
       }
@@ -54,7 +68,7 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
         <Minimos
           slitDistanceMm={slitDistance}
           screenDistanceM={screenDistance}
-          fringeSpacingMm={fringeSpacing}
+          fringeSpacingMm={fringeSpacingMm}
         />
       }
       results={<ResultsPanel results={results} />}
@@ -66,31 +80,26 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
           <ul className="mb-3 ml-4 list-disc text-sm text-slate-400">
             <li>Separación entre rendijas: <Formula math="d = 2 \text{ mm} = 2 \times 10^{-3} \text{ m}" /></li>
             <li>Distancia a la pantalla: <Formula math="L = 50 \text{ cm} = 0.5 \text{ m}" /></li>
-            <li>Distancia entre dos mínimos consecutivos cercanos al centro: <Formula math="\Delta y = 0.6 \text{ mm} = 6 \times 10^{-4} \text{ m}" /></li>
+            <li>Longitud de onda de la fuente: <Formula math="\lambda = 550 \text{ nm} = 5.50 \times 10^{-7} \text{ m}" /></li>
           </ul>
 
           <p className="mb-2">
             <strong className="text-slate-200">Fórmula de la separación entre mínimos consecutivos:</strong>
           </p>
           <p className="mb-2 text-sm text-slate-400">
-            Para la doble rendija, la distancia entre mínimos (o máximos) consecutivos es la misma que la separación entre franjas:
+            Para la doble rendija, la distancia entre mínimos (o máximos) consecutivos es:
           </p>
           <Formula math="\Delta y = \frac{\lambda L}{d}" block />
 
           <p className="mb-2 mt-4">
-            <strong className="text-slate-200">Despeje de la longitud de onda:</strong>
-          </p>
-          <Formula math="\lambda = \frac{\Delta y \cdot d}{L}" block />
-
-          <p className="mb-2 mt-4">
             <strong className="text-slate-200">Sustitución paso a paso:</strong>
           </p>
-          <Formula math="\lambda = \frac{6 \times 10^{-4} \text{ m} \times 2 \times 10^{-3} \text{ m}}{0.5 \text{ m}}" block />
-          <Formula math="\lambda = \frac{1.2 \times 10^{-6} \text{ m}^2}{0.5 \text{ m}}" block />
-          <Formula math="\lambda = 2.4 \times 10^{-6} \text{ m} = 2400 \text{ nm}" block />
+          <Formula math="\Delta y = \frac{5.50 \times 10^{-7} \text{ m} \times 0.5 \text{ m}}{2 \times 10^{-3} \text{ m}}" block />
+          <Formula math="\Delta y = \frac{2.75 \times 10^{-7} \text{ m}^2}{2 \times 10^{-3} \text{ m}}" block />
+          <Formula math="\Delta y = 1.375 \times 10^{-4} \text{ m} = 0.1375 \text{ mm}" block />
 
           <p className="mt-4 text-sm text-slate-400">
-            <strong className="text-slate-200">Resultado:</strong> La longitud de onda de la luz es <Formula math="\lambda = 2.4 \times 10^{-6} \text{ m}" /> (equivalente a <Formula math="2400 \text{ nm}" />). Este valor corresponde a radiación infrarroja cercana; en un contexto visible, los parámetros ilustran la relación entre la separación de mínimos y la longitud de onda.
+            <strong className="text-slate-200">Resultado:</strong> La separación entre mínimos consecutivos es <Formula math="\Delta y = 0.1375 \text{ mm}" />. Al modificar la separación entre rendijas <Formula math="d" />, la distancia a la pantalla <Formula math="L" />, o la longitud de onda <Formula math="\lambda" />, el patrón de interferencia cambia dinámicamente.
           </p>
         </TheoryPanel>
       }

@@ -132,13 +132,13 @@ export function PeliculaDelgadaPage({ exercise }: { exercise: Exercise }) {
               <strong className="text-cyan-400">Rayo incidente (amarillo):</strong> Es la luz que llega desde arriba hacia la película. El color amarillo indica que es luz visible.
             </li>
             <li>
-              <strong className="text-cyan-400">Rayo reflejado 1 (rojo):</strong> Es la parte de la luz que se refleja en la <strong>superficie superior</strong> de la película. Se muestra en rojo porque sufre un <strong>cambio de fase de π (180°)</strong> al reflejarse en un medio de mayor índice de refracción. La etiqueta "(cambio π)" lo indica.
+              <strong className="text-cyan-400">Rayo reflejado 1 (rojo):</strong> Es la parte de la luz que se refleja en la <strong>superficie superior</strong> de la película. Se muestra en rojo porque sufre un <strong>cambio de fase de π (180°)</strong> al reflejarse en un medio de mayor índice de refracción. En la realidad viaja en la misma dirección que el rayo incidente (hacia arriba); aquí se dibuja ligeramente desplazado solo para poder distinguirlo.
             </li>
             <li>
-              <strong className="text-cyan-400">Rayo transmitido y reflejado 2 (cyan punteado):</strong> Es la parte de la luz que atraviesa la película, se refleja en la <strong>superficie inferior</strong> (sin cambio de fase), y vuelve a salir. Se muestra con línea punteada para distinguirlo del rayo reflejado 1.
+              <strong className="text-cyan-400">Rayo transmitido y reflejado 2 (cyan):</strong> Es la parte de la luz que atraviesa la película, se refleja en la <strong>superficie inferior</strong> (sin cambio de fase), y vuelve a salir. La parte interna se muestra con línea punteada. En la realidad coincide en dirección con el rayo reflejado 1; se dibuja desplazado solo para visualización.
             </li>
             <li>
-              <strong className="text-cyan-400">Indicador de espesor t:</strong> La línea vertical punteada con marcas en los extremos muestra el espesor <Formula math="t" /> de la película. Esta es la incógnita que estás calculando.
+              <strong className="text-cyan-400">Indicador de recorrido óptico 2nt:</strong> La línea vertical punteada con marcas en los extremos muestra el recorrido extra <Formula math="2nt" /> que realiza el rayo 2 al atravesar dos veces la película. El espesor <Formula math="t" /> es la incógnita que estás calculando.
             </li>
           </ul>
 

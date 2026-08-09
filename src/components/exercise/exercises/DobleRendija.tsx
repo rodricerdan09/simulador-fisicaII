@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { VisualizationCanvas } from "../VisualizationCanvas";
 import { wavelengthToCss } from "@/lib/physics/wavelengthToColor";
 
@@ -23,140 +23,184 @@ export function DobleRendija({
   const dM = slitDistanceMm * 1e-3;
   const LM = screenDistanceM;
 
+  // Para m = 0 no se determina λ; se usa un valor representativo solo para la visualización.
+  const visualLambdaM = lambdaM || 550e-9;
+
   const fringeSpacingM = useMemo(() => {
     if (dM === 0) return 0;
-    return (lambdaM * LM) / dM;
-  }, [lambdaM, LM, dM]);
+    return (visualLambdaM * LM) / dM;
+  }, [visualLambdaM, LM, dM]);
 
-  const color = wavelengthToCss(lambdaNm);
-  const width = 640;
+  const color = wavelengthToCss(lambdaNm || 550);
+  const width = 540;
   const height = 320;
   const barrierX = 120;
-  const screenX = 540;
   const midY = height / 2;
   const slitGapPx = Math.min(80, (slitDistanceMm / 0.1) * 8);
 
   const waveCount = 8;
   const waves = useMemo(() => {
     const out = [];
+    const visualLambdaNm = lambdaNm || 550;
     for (let i = 1; i <= waveCount; i++) {
-      out.push(i * (lambdaNm / 700) * 18 + 4);
+      out.push(i * (visualLambdaNm / 700) * 18 + 4);
     }
     return out;
   }, [lambdaNm]);
 
-  const screenBars = useMemo(() => {
-    const bars = [];
-    const maxOrder = Math.floor(dM / lambdaM);
-    const clampedOrder = Math.min(maxOrder, 12);
-    for (let m = -clampedOrder; m <= clampedOrder; m++) {
-      const yM = m * fringeSpacingM;
-      const yPx = midY + (yM / 0.01) * 120;
-      if (yPx < 10 || yPx > height - 10) continue;
-      const intensity = Math.cos((Math.PI * dM * yM) / (lambdaM * LM)) ** 2;
-      bars.push({ m, yPx, intensity });
+  const screenCanvasRef = useRef<HTMLCanvasElement>(null);
+  const yRangeM = 5 * fringeSpacingM;
+  // Ancho efectivo de rendija usado solo para modelar la envolvente de difracción.
+  const slitWidthM = dM / 5;
+
+  useEffect(() => {
+    const canvas = screenCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const w = canvas.width;
+    const h = canvas.height;
+    const imageData = ctx.createImageData(w, h);
+    const data = imageData.data;
+
+    ctx.clearRect(0, 0, w, h);
+
+    if (dM === 0 || visualLambdaM === 0 || LM === 0 || fringeSpacingM === 0) {
+      return;
     }
-    return bars;
-  }, [dM, lambdaM, LM, fringeSpacingM, midY, height]);
+
+    const rgbMatch = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    const rBase = rgbMatch ? parseInt(rgbMatch[1], 10) : 34;
+    const gBase = rgbMatch ? parseInt(rgbMatch[2], 10) : 211;
+    const bBase = rgbMatch ? parseInt(rgbMatch[3], 10) : 238;
+
+    for (let row = 0; row < h; row++) {
+      const yM = ((row / h) * 2 - 1) * yRangeM;
+      const phase = (Math.PI * dM * yM) / (visualLambdaM * LM);
+      const interference = Math.cos(phase) ** 2;
+
+      // Envolvente de difracción por una sola rendija: (sin β / β)².
+      const beta = (Math.PI * slitWidthM * yM) / (visualLambdaM * LM);
+      const envelope = beta === 0 ? 1 : (Math.sin(beta) / beta) ** 2;
+      const intensity = interference * envelope;
+
+      const r = Math.min(255, Math.round(rBase * intensity + 15 * (1 - intensity)));
+      const g = Math.min(255, Math.round(gBase * intensity + 23 * (1 - intensity)));
+      const b = Math.min(255, Math.round(bBase * intensity + 42 * (1 - intensity)));
+
+      for (let col = 0; col < w; col++) {
+        const idx = (row * w + col) * 4;
+        data[idx] = r;
+        data[idx + 1] = g;
+        data[idx + 2] = b;
+        data[idx + 3] = 255;
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    // Marcar la franja brillante de orden m seleccionada.
+    const yM = orderM * fringeSpacingM;
+    if (Math.abs(yM) <= yRangeM * 1.05) {
+      const markerY = ((-yM / yRangeM) * 0.5 + 0.5) * h;
+      ctx.strokeStyle = "rgba(255,255,255,0.9)";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(0, markerY);
+      ctx.lineTo(w, markerY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }, [visualLambdaM, dM, LM, orderM, fringeSpacingM, yRangeM, slitWidthM, color]);
 
   return (
     <VisualizationCanvas title="Visualización: patrón de interferencia">
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        className="h-auto w-full max-w-full md:max-w-xl mx-auto"
-        aria-label="Doble rendija"
-      >
-        <defs>
-          <linearGradient id="screenGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.05" />
-            <stop offset="50%" stopColor={color} stopOpacity="0.4" />
-            <stop offset="100%" stopColor={color} stopOpacity="0.05" />
-          </linearGradient>
-        </defs>
+      <div className="flex items-center justify-center gap-1">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          className="h-auto w-full max-w-full md:max-w-lg"
+          aria-label="Doble rendija"
+        >
+          {/* Ondas desde rendija superior */}
+          {waves.map((r, i) => (
+            <circle
+              key={`top-${i}`}
+              cx={barrierX}
+              cy={midY - slitGapPx / 2}
+              r={r}
+              fill="none"
+              stroke={color}
+              strokeWidth={1.5}
+              opacity={0.35}
+            />
+          ))}
 
-        {/* Ondas desde rendija superior */}
-        {waves.map((r, i) => (
-          <circle
-            key={`top-${i}`}
-            cx={barrierX}
-            cy={midY - slitGapPx / 2}
-            r={r}
-            fill="none"
-            stroke={color}
-            strokeWidth={1.5}
-            opacity={0.35}
+          {/* Ondas desde rendija inferior */}
+          {waves.map((r, i) => (
+            <circle
+              key={`bottom-${i}`}
+              cx={barrierX}
+              cy={midY + slitGapPx / 2}
+              r={r}
+              fill="none"
+              stroke={color}
+              strokeWidth={1.5}
+              opacity={0.35}
+            />
+          ))}
+
+          {/* Barrera con rendijas */}
+          <rect
+            x={barrierX - 4}
+            y={0}
+            width={8}
+            height={midY - slitGapPx / 2 - 2}
+            fill="#1e293b"
+            stroke="#334155"
           />
-        ))}
-
-        {/* Ondas desde rendija inferior */}
-        {waves.map((r, i) => (
-          <circle
-            key={`bottom-${i}`}
-            cx={barrierX}
-            cy={midY + slitGapPx / 2}
-            r={r}
-            fill="none"
-            stroke={color}
-            strokeWidth={1.5}
-            opacity={0.35}
+          <rect
+            x={barrierX - 4}
+            y={midY + slitGapPx / 2 + 2}
+            width={8}
+            height={height - (midY + slitGapPx / 2 + 2)}
+            fill="#1e293b"
+            stroke="#334155"
           />
-        ))}
 
-        {/* Barrera con rendijas */}
-        <rect
-          x={barrierX - 4}
-          y={0}
-          width={8}
-          height={midY - slitGapPx / 2 - 2}
-          fill="#1e293b"
-          stroke="#334155"
-        />
-        <rect
-          x={barrierX - 4}
-          y={midY + slitGapPx / 2 + 2}
-          width={8}
-          height={height - (midY + slitGapPx / 2 + 2)}
-          fill="#1e293b"
-          stroke="#334155"
-        />
-
-        {/* Pantalla */}
-        <rect
-          x={screenX}
-          y={20}
-          width={12}
-          height={height - 40}
-          fill="url(#screenGradient)"
-          stroke={color}
-          strokeWidth={1}
-          opacity={0.8}
-        />
-
-        {/* Franjas de interferencia */}
-        {screenBars.map((bar) => (
-          <line
-            key={bar.m}
-            x1={screenX}
-            y1={bar.yPx}
-            x2={screenX + 12}
-            y2={bar.yPx}
+          {/* Marco de la pantalla (el patrón se dibuja en el canvas) */}
+          <rect
+            x={width - 28}
+            y={20}
+            width={28}
+            height={height - 40}
+            fill="#0f172a"
             stroke={color}
-            strokeWidth={2 + bar.intensity * 4}
-            opacity={0.3 + bar.intensity * 0.7}
+            strokeWidth={1}
+            opacity={0.6}
           />
-        ))}
 
-        {/* Etiquetas */}
-        <text x={barrierX - 10} y={midY - slitGapPx / 2 - 10} textAnchor="end" style={{ fontSize: "15px", fill: "#a7bedf" }}>
-          Rendija 1
-        </text>
-        <text x={barrierX + 10} y={midY + slitGapPx / 2 + 18} textAnchor="start" style={{ fontSize: "15px", fill: "#a7bedf" }}>
-          Rendija 2
-        </text>
-        <text x={screenX + 6} y={height - 4} textAnchor="middle" style={{ fontSize: "15px", fill: "#a7bedf" }}>
-          Pantalla
-        </text>
-      </svg>
+          {/* Etiquetas */}
+          <text x={barrierX - 10} y={midY - slitGapPx / 2 - 10} textAnchor="end" style={{ fontSize: "15px", fill: "#a7bedf" }}>
+            Rendija 1
+          </text>
+          <text x={barrierX + 10} y={midY + slitGapPx / 2 + 18} textAnchor="start" style={{ fontSize: "15px", fill: "#a7bedf" }}>
+            Rendija 2
+          </text>
+          <text x={width - 14} y={height - 4} textAnchor="middle" style={{ fontSize: "15px", fill: "#a7bedf" }}>
+            Pantalla
+          </text>
+        </svg>
+
+        <canvas
+          ref={screenCanvasRef}
+          width={28}
+          height={height}
+          className="h-auto max-h-[320px] rounded-sm"
+          aria-label="Patrón de intensidad cos² con envolvente de difracción"
+        />
+      </div>
 
       <div className="mt-4 grid w-full grid-cols-2 gap-3 text-center text-xs text-slate-400 sm:grid-cols-4">
         <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
@@ -192,11 +236,12 @@ export function computeDobleRendija(
   const y_m = fringePositionCm * 1e-2;
 
   // a) Calcular longitud de onda: λ = y_m * d / (m * L)
-  const lambda = (y_m * d) / (m * L);
+  // Para m = 0 la posición central no permite determinar λ (cualquier λ da y = 0).
+  const lambda = m === 0 ? 0 : (y_m * d) / (m * L);
   const lambdaNm = lambda * 1e9;
 
   // b) Calcular separación entre franjas: Δy = λ * L / d
-  const fringeSpacing = (lambda * L) / d;
+  const fringeSpacing = d === 0 ? 0 : (lambda * L) / d;
   const fringeSpacingMm = fringeSpacing * 1000;
 
   return [

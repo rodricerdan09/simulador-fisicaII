@@ -26,8 +26,7 @@ export function Intensidad({
   slitDistanceMm,
   screenDistanceM,
   intensityI0,
-  key: componentKey,
-}: IntensidadProps & { key?: string }) {
+}: IntensidadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const lambdaM = lambdaNm * 1e-9;
@@ -90,7 +89,7 @@ export function Intensidad({
     }
 
     ctx.putImageData(imageData, 0, 0);
-  }, [lambdaM, dM, LM, I0, yMaxM, color, componentKey]);
+  }, [lambdaM, dM, LM, I0, yMaxM, color]);
 
   // Data for the Recharts plot.
   const { curveData, maximaData, minimaData } = useMemo(() => {
@@ -138,6 +137,7 @@ export function Intensidad({
         <div className="h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
+              key={`chart-${lambdaNm}-${slitDistanceMm}-${screenDistanceM}-${intensityI0}`}
               data={curveData}
               margin={{ top: 10, right: 20, bottom: 10, left: 0 }}
             >

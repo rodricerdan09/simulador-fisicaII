@@ -25,7 +25,7 @@ export function Minimos({
   }, [deltaYM, dM, LM]);
 
   const lambdaNm = lambdaM * 1e9;
-  const color = wavelengthToCss(lambdaNm);
+  const color = wavelengthToCss(lambdaNm || 550);
 
   const width = 640;
   const height = 400;
@@ -37,26 +37,30 @@ export function Minimos({
   const waveCount = 8;
   const waves = useMemo(() => {
     const out = [];
+    const visualLambdaNm = lambdaNm || 550;
     for (let i = 1; i <= waveCount; i++) {
-      out.push(i * (lambdaNm / 700) * 18 + 4);
+      out.push(i * (visualLambdaNm / 700) * 18 + 4);
     }
     return out;
   }, [lambdaNm]);
 
-  // Escala dinámica
-  const scalePxPerM = deltaYM > 0 ? (height / 2 - 60) / (deltaYM * 5) : 10000;
+  // Separación entre mínimos consecutivos: Δy = λ·L / d (depende explícitamente de d).
+  const minSpacingM = dM === 0 || LM === 0 ? 0 : (lambdaM * LM) / dM;
+
+  // Escala dinámica basada en la separación física actual.
+  const scalePxPerM = minSpacingM > 0 ? (height / 2 - 60) / (minSpacingM * 5) : 10000;
 
   const minima = useMemo(() => {
     const items = [];
     for (let m = -5; m <= 4; m++) {
-      const yM = (m + 0.5) * deltaYM;
+      const yM = (m + 0.5) * minSpacingM;
       const yPx = midY - yM * scalePxPerM;
       if (yPx >= 20 && yPx <= height - 20) {
         items.push({ m, yPx, yM });
       }
     }
     return items;
-  }, [deltaYM, midY, height, scalePxPerM]);
+  }, [minSpacingM, midY, height, scalePxPerM]);
 
   const yTopMin = minima.find((m) => m.m === -1);
   const yBottomMin = minima.find((m) => m.m === 0);
@@ -136,10 +140,12 @@ export function Minimos({
 
         {/* Franjas de interferencia (máximos) */}
         {[-2, -1, 0, 1, 2].map((m) => {
-          const yM = m * deltaYM;
-          const yPx = midY - yM * 10000;
+          const yM = m * minSpacingM;
+          const yPx = midY - yM * scalePxPerM;
           if (yPx < 20 || yPx > height - 20) return null;
-          const intensity = Math.cos((Math.PI * dM * yM) / (lambdaM * LM)) ** 2;
+          const intensity = lambdaM === 0 || LM === 0 || dM === 0
+            ? 0
+            : Math.cos((Math.PI * dM * yM) / (lambdaM * LM)) ** 2;
           return (
             <line
               key={`max-${m}`}
