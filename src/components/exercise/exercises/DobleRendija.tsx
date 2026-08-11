@@ -32,9 +32,10 @@ export function DobleRendija({
   }, [visualLambdaM, LM, dM]);
 
   const color = wavelengthToCss(lambdaNm || 550);
-  const width = 540;
-  const height = 320;
+  const width = 640;
+  const height = 400;
   const barrierX = 120;
+  const screenX = 540;
   const midY = height / 2;
   const slitGapPx = Math.min(80, (slitDistanceMm / 0.1) * 8);
 
@@ -171,9 +172,9 @@ export function DobleRendija({
 
           {/* Marco de la pantalla (el patrón se dibuja en el canvas) */}
           <rect
-            x={width - 28}
+            x={screenX}
             y={20}
-            width={28}
+            width={40}
             height={height - 40}
             fill="#0f172a"
             stroke={color}
@@ -188,16 +189,16 @@ export function DobleRendija({
           <text x={barrierX + 10} y={midY + slitGapPx / 2 + 18} textAnchor="start" style={{ fontSize: "15px", fill: "#a7bedf" }}>
             Rendija 2
           </text>
-          <text x={width - 14} y={height - 4} textAnchor="middle" style={{ fontSize: "15px", fill: "#a7bedf" }}>
+          <text x={screenX + 20} y={height - 4} textAnchor="middle" style={{ fontSize: "15px", fill: "#a7bedf" }}>
             Pantalla
           </text>
         </svg>
 
         <canvas
           ref={screenCanvasRef}
-          width={28}
+          width={40}
           height={height}
-          className="h-auto max-h-[320px] rounded-sm"
+          className="h-auto max-h-[400px] rounded-sm"
           aria-label="Patrón de intensidad cos² con envolvente de difracción"
         />
       </div>

@@ -126,7 +126,7 @@ export function PeliculaDelgada({
         />
 
         {/* Indicador de cambio de fase π en la reflexión superior */}
-        <g transform={`translate(${centerX - rayOffset}, ${topY - 55})`}>
+        <g transform={`translate(${centerX - rayOffset - 30}, ${topY - 55})`}>
           <text x={0} y={-7} textAnchor="middle" style={{ fontSize: "18px", fontWeight: "bold", fill: "#a7bedf" }}>
             π
           </text>
@@ -189,13 +189,13 @@ export function PeliculaDelgada({
         </text>
 
         {/* Etiquetas */}
-        <text x={centerX + 12} y={55} style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}>
+        <text x={centerX} y={30} textAnchor="middle" style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}>
           Incidente
         </text>
-        <text x={centerX - rayOffset} y={45} textAnchor="middle" style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}>
+        <text x={centerX - rayOffset - 40} y={45} textAnchor="middle" style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}>
           Reflejada 1 (cambio π)
         </text>
-        <text x={centerX + rayOffset} y={45} textAnchor="middle" style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}>
+        <text x={centerX + rayOffset + 40} y={45} textAnchor="middle" style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}>
           Reflejada 2
         </text>
         <text x={centerX + rayOffset} y={bottomY + 35} textAnchor="middle" style={{ fontSize: "13px", fill: "#a7bedf" }}>
