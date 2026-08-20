@@ -12,8 +12,8 @@ import { Formula } from "@/lib/katex/render";
 export function DobleRendijaPage({ exercise }: { exercise: Exercise }) {
   const [screenDistance, setScreenDistance] = useState(1.2);
   const [slitDistance, setSlitDistance] = useState(0.03);
-  const [orderM, setOrderM] = useState(0);
-  const [fringePosition, setFringePosition] = useState(2.25);
+  const [orderM, setOrderM] = useState(2);
+  const [fringePosition, setFringePosition] = useState(4.5);
 
   const results = computeDobleRendija(screenDistance, slitDistance, orderM, fringePosition);
 
@@ -78,8 +78,8 @@ export function DobleRendijaPage({ exercise }: { exercise: Exercise }) {
           <ul className="mb-3 ml-4 list-disc text-sm text-slate-400">
             <li>Distancia pantalla a rendijas: <Formula math="L = 1.2 \text{ m}" /></li>
             <li>Separación entre rendijas: <Formula math="d = 0.03 \text{ mm} = 3 \times 10^{-5} \text{ m}" /></li>
-            <li>Orden de la franja brillante: <Formula math="m = 1" /></li>
-            <li>Posición de la franja: <Formula math="y_1 = 2.25 \text{ cm} = 0.0225 \text{ m}" /></li>
+            <li>Orden de la franja brillante: <Formula math="m = 2" /></li>
+            <li>Posición de la franja: <Formula math="y_2 = 4.5 \text{ cm} = 0.045 \text{ m}" /></li>
           </ul>
 
           <p className="mb-2">
@@ -92,7 +92,7 @@ export function DobleRendijaPage({ exercise }: { exercise: Exercise }) {
           <p className="my-2">Despejando λ:</p>
           <Formula math="\lambda = \frac{y_m \cdot d}{m \cdot L}" block />
           <p className="my-2">Sustituyendo valores:</p>
-          <Formula math="\lambda = \frac{0.0225 \times 3 \times 10^{-5}}{1 \times 1.2} = 5.625 \times 10^{-7} \text{ m} = 562.5 \text{ nm}" block />
+          <Formula math="\lambda = \frac{0.045 \times 3 \times 10^{-5}}{2 \times 1.2} = 5.625 \times 10^{-7} \text{ m} = 562.5 \text{ nm}" block />
 
           <p className="mb-2 mt-4">
             <strong className="text-slate-200">b) Calcular la separación entre franjas (Δy):</strong>
@@ -118,6 +118,12 @@ export function DobleRendijaPage({ exercise }: { exercise: Exercise }) {
             verde-amarilla, cercana a la longitud de onda de máxima sensibilidad del ojo humano (555 nm).
           </p>
 
+          <div className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
+            <p className="text-sm text-cyan-300">
+              <strong>¿Qué es el "orden" (m)?</strong> En interferencia, el orden <Formula math="m" /> indica la posición de la franja brillante respecto al centro. <Formula math="m = 0" /> es la franja central (máximo principal), <Formula math="m = \pm 1" /> son las primeras franjas laterales, <Formula math="m = \pm 2" /> las segundas, etc. En este problema, <Formula math="m = 2" /> significa que la franja medida está a dos franjas brillantes del centro.
+            </p>
+          </div>
+
           <h4 className="mb-2 mt-4 text-sm font-semibold text-slate-50">
             Interpretación de la visualización
           </h4>
@@ -133,15 +139,18 @@ export function DobleRendijaPage({ exercise }: { exercise: Exercise }) {
               <strong className="text-cyan-400">Barrera vertical:</strong> Simula la pantalla opaca con las dos rendijas estrechas. La separación entre ellas es el parámetro <Formula math="d" /> que podés modificar con el slider.
             </li>
             <li>
-              <strong className="text-cyan-400">Pantalla (lado derecho):</strong> Es donde se proyecta el patrón de interferencia. El canvas muestra la intensidad real <Formula math="I = I_0 \cos^2(\pi d y / \lambda L)" /> multiplicada por la envolvente de difracción de cada rendija: las franjas brillantes se atenúan hacia los costados, como ocurre en el experimento real.
+              <strong className="text-cyan-400">Pantalla (canvas derecho):</strong> Muestra la distribución de intensidad luminosa <Formula math="I = I_0 \cos^2(\pi d y / \lambda L)" /> con envolvente de difracción. Las franjas brillantes (máximos) se atenúan hacia los costados, como en el experimento real.
             </li>
             <li>
-              <strong className="text-cyan-400">Línea punteada blanca:</strong> Marca la <strong>posición exacta</strong> de la franja brillante de orden <Formula math="m" /> que estás calculando. El orden <Formula math="m = 0" /> es la franja central; los valores positivos corresponden a la parte superior de la pantalla y los negativos a la parte inferior.
+              <strong className="text-cyan-400">Líneas horizontales con etiquetas de orden:</strong> Cada franja brillante está marcada con una línea horizontal y su orden <Formula math="m" />. La franja central (<Formula math="m = 0" />) tiene una línea blanca sólida; las demás (<Formula math="m = \pm 1, \pm 2, \dots" />) tienen líneas blancas punteadas. Las etiquetas muestran el orden de cada franja.
+            </li>
+            <li>
+              <strong className="text-cyan-400">Línea cyan punteada (orden seleccionado):</strong> Resalta la franja brillante de orden <Formula math="m" /> que estás calculando. La etiqueta cyan muestra el valor de <Formula math="y_m" /> en centímetros. En este problema, <Formula math="m = 2" /> está resaltado con <Formula math="y_2 = 4.50 \text{ cm}" />.
             </li>
           </ul>
 
           <p className="text-sm leading-relaxed text-slate-400">
-            <strong className="text-slate-300">¿Qué observar cuando modificás los parámetros?</strong> Al aumentar la distancia <Formula math="L" /> a la pantalla, las franjas se separan. Al aumentar la separación <Formula math="d" /> entre rendijas, las franjas se acercan entre sí. Al cambiar el orden <Formula math="m" />, la línea punteada se ubica en la franja correspondiente: <Formula math="m = 0" /> es la franja central, los valores positivos están por encima del centro y los negativos por debajo. El color del patrón cambia según la longitud de onda calculada.
+            <strong className="text-slate-300">¿Qué observar cuando modificás los parámetros?</strong> Al aumentar la distancia <Formula math="L" /> a la pantalla, las franjas se separan. Al aumentar la separación <Formula math="d" /> entre rendijas, las franjas se acercan entre sí. Al cambiar el orden <Formula math="m" />, la línea cyan se ubica en la franja correspondiente y la etiqueta muestra su posición <Formula math="y_m" />. El color del patrón cambia según la longitud de onda calculada.
           </p>
 
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">

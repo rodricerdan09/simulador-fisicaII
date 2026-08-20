@@ -101,18 +101,61 @@ export function DobleRendija({
 
     ctx.putImageData(imageData, 0, 0);
 
-    // Marcar la franja brillante de orden m seleccionada.
-    const yM = orderM * fringeSpacingM;
-    if (Math.abs(yM) <= yRangeM * 1.05) {
+    // Calcular el orden máximo visible
+    const maxOrder = Math.floor(yRangeM / fringeSpacingM);
+
+    // Dibujar líneas y etiquetas para cada franja brillante (máximo)
+    ctx.font = "bold 11px monospace";
+    ctx.textAlign = "left";
+
+    for (let m = -maxOrder; m <= maxOrder; m++) {
+      const yM = m * fringeSpacingM;
+      if (Math.abs(yM) > yRangeM * 1.05) continue;
+
       const markerY = ((-yM / yRangeM) * 0.5 + 0.5) * h;
-      ctx.strokeStyle = "rgba(255,255,255,0.9)";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([4, 3]);
+
+      // Línea horizontal para cada máximo
+      ctx.strokeStyle = m === 0 ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.5)";
+      ctx.lineWidth = m === 0 ? 2 : 1.5;
+      ctx.setLineDash(m === 0 ? [] : [4, 3]);
       ctx.beginPath();
       ctx.moveTo(0, markerY);
       ctx.lineTo(w, markerY);
       ctx.stroke();
       ctx.setLineDash([]);
+
+      // Etiqueta con el orden m
+      ctx.fillStyle = m === 0 ? "#ffffff" : "rgba(255,255,255,0.8)";
+      const label = `m=${m}`;
+      ctx.fillText(label, 4, markerY - 4);
+    }
+
+    // Resaltar la franja de orden m seleccionada con línea más gruesa
+    const ySelected = orderM * fringeSpacingM;
+    if (Math.abs(ySelected) <= yRangeM * 1.05) {
+      const markerY = ((-ySelected / yRangeM) * 0.5 + 0.5) * h;
+
+      // Línea cyan más visible para el orden seleccionado
+      ctx.strokeStyle = "#22d3ee";
+      ctx.lineWidth = 3;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, markerY);
+      ctx.lineTo(w, markerY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Etiqueta destacada con fondo
+      ctx.font = "bold 12px monospace";
+      const yM_cm = (ySelected * 100).toFixed(2);
+      const label = `m=${orderM}, y=${yM_cm} cm`;
+      const textWidth = ctx.measureText(label).width;
+
+      ctx.fillStyle = "rgba(34, 211, 238, 0.95)";
+      ctx.fillRect(4, markerY - 18, textWidth + 10, 20);
+
+      ctx.fillStyle = "#0f172a";
+      ctx.fillText(label, 9, markerY - 4);
     }
   }, [visualLambdaM, dM, LM, orderM, fringeSpacingM, yRangeM, slitWidthM, color]);
 
@@ -121,7 +164,7 @@ export function DobleRendija({
       <div className="flex items-center justify-center gap-1">
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          className="h-auto w-full max-w-full md:max-w-lg"
+          className="h-[270px] w-auto"
           aria-label="Doble rendija"
         >
           {/* Ondas desde rendija superior */}
@@ -174,7 +217,7 @@ export function DobleRendija({
           <rect
             x={screenX}
             y={20}
-            width={40}
+            width={120}
             height={height - 40}
             fill="#0f172a"
             stroke={color}
@@ -189,36 +232,38 @@ export function DobleRendija({
           <text x={barrierX + 10} y={midY + slitGapPx / 2 + 18} textAnchor="start" style={{ fontSize: "15px", fill: "#a7bedf" }}>
             Rendija 2
           </text>
-          <text x={screenX + 20} y={height - 4} textAnchor="middle" style={{ fontSize: "15px", fill: "#a7bedf" }}>
+          <text x={screenX + 60} y={height - 4} textAnchor="middle" style={{ fontSize: "15px", fill: "#a7bedf" }}>
             Pantalla
           </text>
         </svg>
 
         <canvas
           ref={screenCanvasRef}
-          width={40}
-          height={height}
-          className="h-auto max-h-[400px] rounded-sm"
+          width={120}
+          height={320}
+          className="w-[120px] h-[270px] rounded-sm"
           aria-label="Patrón de intensidad cos² con envolvente de difracción"
         />
       </div>
 
-      <div className="mt-4 grid w-full grid-cols-2 gap-3 text-center text-xs text-slate-400 sm:grid-cols-4">
-        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
-          <p className="text-slate-500">λ</p>
-          <p className="font-mono text-cyan-400" style={{ color: color }}>{lambdaNm.toFixed(1)} nm</p>
-        </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
-          <p className="text-slate-500">d</p>
-          <p className="font-mono text-cyan-400">{slitDistanceMm.toFixed(3)} mm</p>
-        </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
-          <p className="text-slate-500">L</p>
-          <p className="font-mono text-cyan-400">{screenDistanceM.toFixed(2)} m</p>
-        </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
-          <p className="text-slate-500">Δy</p>
-          <p className="font-mono text-cyan-400">{(fringeSpacingM * 1000).toFixed(2)} mm</p>
+      <div className="mt-4 flex justify-center pl-3">
+        <div className="grid grid-cols-2 gap-3 text-center text-xs text-slate-400 sm:grid-cols-4">
+          <div className="max-w-[110px] rounded-lg border border-slate-800 bg-slate-950/50 p-2">
+            <p className="text-slate-500">λ</p>
+            <p className="font-mono text-cyan-400" style={{ color: color }}>{lambdaNm.toFixed(1)} nm</p>
+          </div>
+          <div className="max-w-[110px] rounded-lg border border-slate-800 bg-slate-950/50 p-2">
+            <p className="text-slate-500">d</p>
+            <p className="font-mono text-cyan-400">{slitDistanceMm.toFixed(3)} mm</p>
+          </div>
+          <div className="max-w-[110px] rounded-lg border border-slate-800 bg-slate-950/50 p-2">
+            <p className="text-slate-500">L</p>
+            <p className="font-mono text-cyan-400">{screenDistanceM.toFixed(2)} m</p>
+          </div>
+          <div className="max-w-[110px] rounded-lg border border-slate-800 bg-slate-950/50 p-2">
+            <p className="text-slate-500">Δy</p>
+            <p className="font-mono text-cyan-400">{(fringeSpacingM * 1000).toFixed(2)} mm</p>
+          </div>
         </div>
       </div>
     </VisualizationCanvas>
