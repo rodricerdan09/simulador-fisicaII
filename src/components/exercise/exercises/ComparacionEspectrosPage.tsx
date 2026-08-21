@@ -14,9 +14,10 @@ export function ComparacionEspectrosPage({ exercise }: { exercise: Exercise }) {
   const [lambda2, setLambda2] = useState(510);
   const [slitDistance, setSlitDistance] = useState(0.025);
   const [screenDistance, setScreenDistance] = useState(1.5);
-  const [orderM, setOrderM] = useState(3);
+  const [orderM1, setOrderM1] = useState(3);
+  const [orderM2, setOrderM2] = useState(3);
 
-  const results = computeComparacionEspectros(lambda1, lambda2, slitDistance, screenDistance, orderM);
+  const results = computeComparacionEspectros(lambda1, lambda2, slitDistance, screenDistance, orderM1, orderM2);
 
   return (
     <ExerciseModule
@@ -60,13 +61,22 @@ export function ComparacionEspectrosPage({ exercise }: { exercise: Exercise }) {
             onChange={setScreenDistance}
           />
           <ParameterControl
-            label="Orden de la franja (m)"
-            value={orderM}
-            min={1}
+            label="Orden para λ₁ (m₁)"
+            value={orderM1}
+            min={0}
             max={5}
             step={1}
             unit=""
-            onChange={setOrderM}
+            onChange={setOrderM1}
+          />
+          <ParameterControl
+            label="Orden para λ₂ (m₂)"
+            value={orderM2}
+            min={0}
+            max={5}
+            step={1}
+            unit=""
+            onChange={setOrderM2}
           />
         </>
       }
@@ -76,7 +86,8 @@ export function ComparacionEspectrosPage({ exercise }: { exercise: Exercise }) {
           lambda2Nm={lambda2}
           slitDistanceMm={slitDistance}
           screenDistanceM={screenDistance}
-          orderM={orderM}
+          orderM1={orderM1}
+          orderM2={orderM2}
         />
       }
       results={<ResultsPanel results={results} />}
@@ -90,31 +101,20 @@ export function ComparacionEspectrosPage({ exercise }: { exercise: Exercise }) {
             <li>Longitud de onda 2: <Formula math="\lambda_2 = 510 \text{ nm} = 5.10 \times 10^{-7} \text{ m}" /></li>
             <li>Separación entre rendijas: <Formula math="d = 0.025 \text{ mm} = 2.5 \times 10^{-5} \text{ m}" /></li>
             <li>Distancia a la pantalla: <Formula math="L = 1.5 \text{ m}" /></li>
-            <li>Orden de la franja: <Formula math="m = 3" /></li>
+            <li>Orden de las franjas: <Formula math="m_1 = m_2 = 3" /></li>
           </ul>
 
           <p className="mb-2">
-            <strong className="text-slate-200">Fórmula de posición de franjas brillantes:</strong>
+            <strong className="text-slate-200">Fórmula de separación entre franjas de diferente longitud de onda:</strong>
           </p>
-          <Formula math="y_m = \frac{m \lambda L}{d}" block />
+          <Formula math="\Delta y = \frac{\Delta \lambda \cdot L \cdot m}{d}" block />
 
           <p className="mb-2 mt-4">
-            <strong className="text-slate-200">Cálculo para λ₁ = 430 nm:</strong>
+            <strong className="text-slate-200">Cálculo directo:</strong>
           </p>
-          <Formula math="y_1 = \frac{3 \times 4.30 \times 10^{-7} \times 1.5}{2.5 \times 10^{-5}}" block />
-          <Formula math="y_1 = 7.74 \times 10^{-2} \text{ m} = 77.4 \text{ mm}" block />
-
-          <p className="mb-2 mt-4">
-            <strong className="text-slate-200">Cálculo para λ₂ = 510 nm:</strong>
-          </p>
-          <Formula math="y_2 = \frac{3 \times 5.10 \times 10^{-7} \times 1.5}{2.5 \times 10^{-5}}" block />
-          <Formula math="y_2 = 9.18 \times 10^{-2} \text{ m} = 91.8 \text{ mm}" block />
-
-          <p className="mb-2 mt-4">
-            <strong className="text-slate-200">Separación entre las franjas:</strong>
-          </p>
-          <Formula math="\Delta y = y_2 - y_1 = 9.18 \times 10^{-2} - 7.74 \times 10^{-2}" block />
-          <Formula math="\Delta y = 1.44 \times 10^{-2} \text{ m} = 14.4 \text{ mm}" block />
+          <Formula math="\Delta y = \frac{(510 - 430) \times 10^{-9} \times 1.5 \times 3}{2.5 \times 10^{-5}}" block />
+          <Formula math="\Delta y = \frac{80 \times 10^{-9} \times 4.5}{2.5 \times 10^{-5}}" block />
+          <Formula math="\Delta y = 14.4 \times 10^{-3} \text{ m} = 14.4 \text{ mm}" block />
 
           <p className="mt-4 text-sm text-slate-400">
             <strong className="text-slate-200">Resultado:</strong> La separación entre las franjas brillantes de orden 3 es <Formula math="\Delta y = 14.4 \text{ mm}" />. La franja correspondiente a λ₂ (510 nm, verde) se encuentra más alejada del centro que la de λ₁ (430 nm, violeta).
@@ -150,15 +150,15 @@ export function ComparacionEspectrosPage({ exercise }: { exercise: Exercise }) {
               <strong className="text-cyan-400">Pantalla (lado derecho):</strong> Es donde se proyectan los patrones de interferencia de ambas longitudes de onda. En un experimento real verías dos conjuntos de franjas superpuestos, cada uno con su propio espaciado.
             </li>
             <li>
-              <strong className="text-cyan-400">Dos líneas horizontales de colores:</strong> Cada línea representa la posición de la franja brillante de orden <Formula math="m" /> para cada longitud de onda. La línea <strong className="text-purple-400">violeta</strong> marca la posición <Formula math="y_1" /> de λ₁ y la línea <strong className="text-green-400">verde</strong> marca la posición <Formula math="y_2" /> de λ₂. Las etiquetas <Formula math="\lambda_1" /> y <Formula math="\lambda_2" /> identifican cuál línea corresponde a cada longitud de onda.
+              <strong className="text-cyan-400">Dos líneas horizontales de colores:</strong> Cada línea representa la posición de la franja brillante de orden <Formula math="m" /> para cada longitud de onda. La línea <strong className="text-purple-400">violeta</strong> marca la posición <Formula math="y_1" /> de λ₁ con orden <Formula math="m_1" /> y la línea <strong className="text-green-400">verde</strong> marca la posición <Formula math="y_2" /> de λ₂ con orden <Formula math="m_2" />. Las etiquetas muestran <Formula math="\lambda_1(m_1)" /> y <Formula math="\lambda_2(m_2)" /> para identificar cada franja.
             </li>
             <li>
-              <strong className="text-cyan-400">Separación entre líneas:</strong> La distancia vertical entre las dos líneas representa <Formula math="\Delta y = y_2 - y_1" />, que es el resultado que estás calculando. Notá que λ₂ (mayor longitud de onda) siempre produce una franja más alejada del centro que λ₁.
+              <strong className="text-cyan-400">Separación entre líneas:</strong> La distancia vertical entre las dos líneas representa <Formula math="\Delta y = |y_2 - y_1|" />, que es el resultado que estás calculando. Notá que λ₂ (mayor longitud de onda) siempre produce una franja más alejada del centro que λ₁ cuando los órdenes son iguales.
             </li>
           </ul>
 
           <p className="text-sm leading-relaxed text-slate-400">
-            <strong className="text-slate-300">¿Qué observar cuando modificás los parámetros?</strong> Al aumentar la distancia <Formula math="L" /> a la pantalla, ambas líneas se separan más entre sí (mayor <Formula math="\Delta y" />). Al aumentar la separación <Formula math="d" /> entre rendijas, ambas líneas se acercan al centro y entre sí. Al cambiar el orden <Formula math="m" />, ambas líneas se mueven proporcionalmente. Al modificar λ₁ o λ₂, solo se mueve la línea correspondiente a esa longitud de onda.
+            <strong className="text-slate-300">¿Qué observar cuando modificás los parámetros?</strong> Al aumentar la distancia <Formula math="L" /> a la pantalla, ambas líneas se separan más entre sí (mayor <Formula math="\Delta y" />). Al aumentar la separación <Formula math="d" /> entre rendijas, ambas líneas se acercan al centro y entre sí. Al cambiar los órdenes <Formula math="m_1" /> o <Formula math="m_2" /> independientemente, solo se mueve la línea correspondiente a esa longitud de onda. Al modificar λ₁ o λ₂, también solo se mueve la línea correspondiente.
           </p>
 
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
