@@ -19,11 +19,8 @@ export function Minimos({
   const LM = screenDistanceM;
   const deltaYM = fringeSpacingMm * 1e-3;
 
-  const lambdaM = useMemo(() => {
-    if (LM === 0) return 0;
-    return (deltaYM * dM) / LM;
-  }, [deltaYM, dM, LM]);
-
+  // Calcular λ a partir de Δy según la fórmula del profesor
+  const lambdaM = LM === 0 ? 0 : (deltaYM * 2 * dM) / (LM * 3);
   const lambdaNm = lambdaM * 1e9;
   const color = wavelengthToCss(lambdaNm || 550);
 
@@ -37,18 +34,20 @@ export function Minimos({
   const waveCount = 8;
   const waves = useMemo(() => {
     const out = [];
-    const visualLambdaNm = lambdaNm || 550;
+    const visualLambdaNm = lambdaNm > 0 && lambdaNm < 1000 ? lambdaNm : 550;
     for (let i = 1; i <= waveCount; i++) {
       out.push(i * (visualLambdaNm / 700) * 18 + 4);
     }
     return out;
   }, [lambdaNm]);
 
-  // Separación entre mínimos consecutivos: Δy = λ·L / d (depende explícitamente de d).
-  const minSpacingM = dM === 0 || LM === 0 ? 0 : (lambdaM * LM) / dM;
+  // Usar directamente deltaYM como la separación entre mínimos
+  const minSpacingM = deltaYM;
 
-  // Escala dinámica basada en la separación física actual.
-  const scalePxPerM = minSpacingM > 0 ? (height / 2 - 60) / (minSpacingM * 5) : 10000;
+  // Escala FIJA basada en valores de referencia para que los mínimos se muevan visualmente
+  // Valores de referencia: Δy_ref = 0.6mm (valor del enunciado)
+  const refDeltaYM = 0.6e-3;
+  const scalePxPerM = refDeltaYM > 0 ? (height / 2 - 60) / (refDeltaYM * 5) : 10000;
 
   const minima = useMemo(() => {
     const items = [];
@@ -143,9 +142,6 @@ export function Minimos({
           const yM = m * minSpacingM;
           const yPx = midY - yM * scalePxPerM;
           if (yPx < 20 || yPx > height - 20) return null;
-          const intensity = lambdaM === 0 || LM === 0 || dM === 0
-            ? 0
-            : Math.cos((Math.PI * dM * yM) / (lambdaM * LM)) ** 2;
           return (
             <line
               key={`max-${m}`}
@@ -154,8 +150,8 @@ export function Minimos({
               x2={screenX + 12}
               y2={yPx}
               stroke={color}
-              strokeWidth={2 + intensity * 4}
-              opacity={0.3 + intensity * 0.7}
+              strokeWidth={3}
+              opacity={0.6}
             />
           );
         })}

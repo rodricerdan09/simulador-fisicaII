@@ -12,22 +12,22 @@ import { Formula } from "@/lib/katex/render";
 export function MinimosPage({ exercise }: { exercise: Exercise }) {
   const [slitDistance, setSlitDistance] = useState(2.0);
   const [screenDistance, setScreenDistance] = useState(0.5);
-  const [lambda, setLambda] = useState(550);
+  const [fringeSpacing, setFringeSpacing] = useState(0.6);
 
-  // Calcular Δy a partir de λ, d, L
-  const lambdaM = lambda * 1e-9;
+  // Calcular λ a partir de Δy, d, L según la fórmula del profesor:
+  // Δy = λ·L/d · (3/2)  →  λ = Δy·2·d/(L·3)
   const dM = slitDistance * 1e-3;
   const LM = screenDistance;
-  const fringeSpacingM = dM === 0 ? 0 : (lambdaM * LM) / dM;
-  const fringeSpacingMm = fringeSpacingM * 1000;
+  const deltaYM = fringeSpacing * 1e-3;
+  const lambdaM = LM === 0 ? 0 : (deltaYM * 2 * dM) / (LM * 3);
+  const lambdaNm = lambdaM * 1e9;
 
   const results = [
     { label: "Separación entre rendijas (d)", value: slitDistance, unit: "mm", precision: 1 },
     { label: "Distancia a la pantalla (L)", value: screenDistance, unit: "m", precision: 1 },
+    { label: "Separación entre mínimos (Δy)", value: fringeSpacing, unit: "mm", precision: 1 },
     { label: "Longitud de onda (λ)", value: lambdaM, unit: "m", precision: 4, scientific: true },
-    { label: "Longitud de onda (λ)", value: lambda, unit: "nm", precision: 0 },
-    { label: "Separación entre mínimos (Δy)", value: fringeSpacingM, unit: "m", precision: 4, scientific: true },
-    { label: "Separación entre mínimos (Δy)", value: fringeSpacingMm, unit: "mm", precision: 2 },
+    { label: "Longitud de onda (λ)", value: lambdaNm, unit: "nm", precision: 0 },
   ];
 
   return (
@@ -54,13 +54,13 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
             onChange={setScreenDistance}
           />
           <ParameterControl
-            label="Longitud de onda (λ)"
-            value={lambda}
-            min={380}
-            max={750}
-            step={5}
-            unit="nm"
-            onChange={setLambda}
+            label="Separación entre mínimos (Δy)"
+            value={fringeSpacing}
+            min={0.1}
+            max={2.0}
+            step={0.1}
+            unit="mm"
+            onChange={setFringeSpacing}
           />
         </>
       }
@@ -68,7 +68,7 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
         <Minimos
           slitDistanceMm={slitDistance}
           screenDistanceM={screenDistance}
-          fringeSpacingMm={fringeSpacingMm}
+          fringeSpacingMm={fringeSpacing}
         />
       }
       results={<ResultsPanel results={results} />}
@@ -80,26 +80,43 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
           <ul className="mb-3 ml-4 list-disc text-sm text-slate-400">
             <li>Separación entre rendijas: <Formula math="d = 2 \text{ mm} = 2 \times 10^{-3} \text{ m}" /></li>
             <li>Distancia a la pantalla: <Formula math="L = 50 \text{ cm} = 0.5 \text{ m}" /></li>
-            <li>Longitud de onda de la fuente: <Formula math="\lambda = 550 \text{ nm} = 5.50 \times 10^{-7} \text{ m}" /></li>
+            <li>Distancia entre dos mínimos consecutivos: <Formula math="\Delta y = 0.6 \text{ mm} = 0.6 \times 10^{-3} \text{ m}" /></li>
           </ul>
 
           <p className="mb-2">
-            <strong className="text-slate-200">Fórmula de la separación entre mínimos consecutivos:</strong>
+            <strong className="text-slate-200">Condición para franjas oscuras (mínimos):</strong>
           </p>
           <p className="mb-2 text-sm text-slate-400">
-            Para la doble rendija, la distancia entre mínimos (o máximos) consecutivos es:
+            La posición de una franja oscura está dada por:
           </p>
-          <Formula math="\Delta y = \frac{\lambda L}{d}" block />
+          <Formula math="y = \frac{\lambda L}{d} \left(m + \frac{1}{2}\right)" block />
 
           <p className="mb-2 mt-4">
-            <strong className="text-slate-200">Sustitución paso a paso:</strong>
+            <strong className="text-slate-200">Distancia entre mínimos consecutivos:</strong>
           </p>
-          <Formula math="\Delta y = \frac{5.50 \times 10^{-7} \text{ m} \times 0.5 \text{ m}}{2 \times 10^{-3} \text{ m}}" block />
-          <Formula math="\Delta y = \frac{2.75 \times 10^{-7} \text{ m}^2}{2 \times 10^{-3} \text{ m}}" block />
-          <Formula math="\Delta y = 1.375 \times 10^{-4} \text{ m} = 0.1375 \text{ mm}" block />
+          <p className="mb-2 text-sm text-slate-400">
+            La separación entre dos franjas oscuras consecutivas es:
+          </p>
+          <Formula math="\Delta y = \frac{\lambda L}{d} \cdot \Delta\left(m + \frac{1}{2}\right)" block />
+          <p className="mb-2 text-sm text-slate-400">
+            Como <Formula math="\Delta m = 1" />, entonces:
+          </p>
+          <Formula math="\Delta y = \frac{\lambda L}{d} \cdot \frac{3}{2}" block />
+
+          <p className="mb-2 mt-4">
+            <strong className="text-slate-200">Despejando la longitud de onda:</strong>
+          </p>
+          <Formula math="\lambda = \frac{\Delta y \cdot 2 \cdot d}{L \cdot 3}" block />
+
+          <p className="mb-2 mt-4">
+            <strong className="text-slate-200">Sustitución:</strong>
+          </p>
+          <Formula math="\lambda = \frac{0.6 \times 10^{-3} \times 2 \times 2 \times 10^{-3}}{0.5 \times 3}" block />
+          <Formula math="\lambda = \frac{2.4 \times 10^{-6}}{1.5}" block />
+          <Formula math="\lambda = 1.6 \times 10^{-6} \text{ m} = 1600 \text{ nm}" block />
 
           <p className="mt-4 text-sm text-slate-400">
-            <strong className="text-slate-200">Resultado:</strong> La separación entre mínimos consecutivos es <Formula math="\Delta y = 0.1375 \text{ mm}" />. Al modificar la separación entre rendijas <Formula math="d" />, la distancia a la pantalla <Formula math="L" />, o la longitud de onda <Formula math="\lambda" />, el patrón de interferencia cambia dinámicamente.
+            <strong className="text-slate-200">Resultado:</strong> La longitud de onda de la luz es <Formula math="\lambda = 1.6 \times 10^{-6} \text{ m}" /> (equivalente a <Formula math="1600 \text{ nm}" />). Este valor corresponde a radiación infrarroja.
           </p>
         </TheoryPanel>
       }
@@ -112,6 +129,12 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
             Los mínimos de interferencia aparecen donde la diferencia de camino óptico es un múltiplo semi-entero de la longitud de onda.
             Medir la separación entre mínimos consecutivos permite determinar λ de forma experimental, una técnica fundamental en interferometría.
           </p>
+
+          <div className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
+            <p className="text-sm text-cyan-300">
+              <strong>Relación con la separación entre rendijas (d):</strong> La posición de los mínimos depende inversamente de <Formula math="d" />. Al aumentar la separación entre rendijas, los mínimos se acercan entre sí (menor <Formula math="\Delta y" />). Al disminuir <Formula math="d" />, los mínimos se separan más. Esta dependencia es crucial para entender cómo la geometría del experimento afecta el patrón de interferencia.
+            </p>
+          </div>
 
           <h4 className="mb-2 mt-4 text-sm font-semibold text-slate-50">
             Interpretación de la visualización
@@ -131,23 +154,20 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
               <strong className="text-cyan-400">Pantalla (lado derecho):</strong> Es donde se proyecta el patrón de interferencia. En un experimento real verías franjas brillantes y oscuras alternadas.
             </li>
             <li>
-              <strong className="text-cyan-400">Líneas punteadas rojas:</strong> Cada línea horizontal punteada representa un <strong>mínimo de interferencia</strong> (franja oscura). Son las posiciones donde las ondas llegan en oposición de fase y se cancelan mutuamente.
+              <strong className="text-cyan-400">Líneas punteadas con etiquetas:</strong> Cada línea horizontal punteada representa un <strong>mínimo de interferencia</strong> (franja oscura). Son las posiciones donde las ondas llegan en oposición de fase y se cancelan mutuamente. Las etiquetas <Formula math="m=0, m=1, m=-1" />, etc., identifican el orden de cada mínimo.
             </li>
             <li>
-              <strong className="text-cyan-400">Etiquetas m=0, m=1, m=-1, etc.:</strong> Identifican el orden de cada mínimo. El mínimo central es <Formula math="m=0" />, y los mínimos se numeran simétricamente a ambos lados del centro (<Formula math="m=\pm 1" />, <Formula math="m=\pm 2" />, etc.).
-            </li>
-            <li>
-              <strong className="text-cyan-400">Indicador Δy con flechas:</strong> La línea vertical con flechas en ambos extremos muestra la <strong>distancia entre dos mínimos consecutivos</strong>. Esta es la medida <Formula math="\Delta y" /> que usás para calcular la longitud de onda.
+              <strong className="text-cyan-400">Indicador Δy con flechas:</strong> La línea vertical con flechas en ambos extremos muestra la <strong>distancia entre dos mínimos consecutivos</strong>. Esta es la medida <Formula math="\Delta y" /> que se calcula automáticamente según los parámetros ingresados.
             </li>
           </ul>
 
           <p className="text-sm leading-relaxed text-slate-400">
-            <strong className="text-slate-300">¿Qué observar cuando modificás los parámetros?</strong> Al aumentar la separación <Formula math="d" /> entre rendijas, los mínimos se acercan entre sí (menor <Formula math="\Delta y" />). Al aumentar la distancia <Formula math="L" /> a la pantalla, los mínimos se separan más. Al modificar <Formula math="\Delta y" /> directamente, la longitud de onda calculada cambia proporcionalmente: mayor separación entre mínimos implica mayor longitud de onda.
+            <strong className="text-slate-300">¿Qué observar cuando modificás los parámetros?</strong> Al aumentar la separación <Formula math="d" /> entre rendijas, los mínimos se acercan entre sí (menor <Formula math="\Delta y" />). Al aumentar la distancia <Formula math="L" /> a la pantalla, los mínimos se separan más. Al modificar la longitud de onda <Formula math="\lambda" />, la separación entre mínimos cambia proporcionalmente: mayor longitud de onda implica mayor separación entre mínimos.
           </p>
 
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
             <p className="text-sm text-cyan-300">
-              <strong>📚 Para mayor detalle:</strong> Visitá la sección de{" "}
+              <strong> Para mayor detalle:</strong> Visitá la sección de{" "}
               <a href="/teoria" className="font-semibold underline hover:text-cyan-200">
                 Teoría → Interferencia Constructiva y Destructiva
               </a>{" "}
