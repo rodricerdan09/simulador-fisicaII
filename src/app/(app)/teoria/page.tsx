@@ -205,7 +205,7 @@ function DiagramaPeliculaDelgada() {
         <text x="495" y="135" className="fill-amber-300" fontSize="14" fontWeight="bold">t</text>
       </svg>
       <p className="text-center text-xs text-slate-400 mt-2">
-        Interferencia en película delgada: el rayo 1 sufre inversión de fase (π), el rayo 2 no
+        Interferencia en película delgada: el rayo 1 se refleja en la superficie superior con inversión de fase (π); el rayo 2 atraviesa la película, se refleja en la superficie inferior sin cambio de fase y recorre una distancia extra de 2nt.
       </p>
     </div>
   );
@@ -465,7 +465,18 @@ export default function TheoryPage() {
             <p className="text-sm text-slate-300 mb-2">
               <strong className="text-cyan-400">Visualización de la interferencia de dos ondas:</strong>
             </p>
-            <svg viewBox="0 0 600 300" className="w-full h-auto">
+            <div className="mb-3 flex flex-wrap items-center gap-4 text-xs">
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-0.5 w-6 bg-blue-500" /> Onda 1
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-0.5 w-6 bg-green-500" /> Onda 2
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-0.5 w-6 bg-red-500" /> Resultante
+              </span>
+            </div>
+            <svg viewBox="0 0 600 300" className="mx-auto w-full max-w-md h-auto">
               {/* Section 1: Constructive */}
               <text x="100" y="20" textAnchor="middle" className="fill-slate-300 text-sm font-bold">φ = 0° (Constructiva)</text>
               <line x1="0" y1="75" x2="200" y2="75" stroke="#475569" strokeWidth="1" />
@@ -486,11 +497,6 @@ export default function TheoryPage() {
               <path d="M 400 275 Q 425 225, 450 275 T 500 275 T 550 275 T 600 275" fill="none" stroke="#3b82f6" strokeWidth="2" />
               <path d="M 400 275 L 417 245 L 433 260 L 450 230 L 467 250 L 483 220 L 500 240 L 517 210 L 533 230 L 550 200 L 567 220 L 583 190 L 600 210" fill="none" stroke="#10b981" strokeWidth="2" />
               <path d="M 400 275 Q 417 240, 433 255 T 467 240 T 500 255 T 533 240 T 567 255 T 600 240" fill="none" stroke="#ef4444" strokeWidth="3" />
-              
-              {/* Labels */}
-              <text x="50" y="100" className="fill-blue-400 text-xs">Onda 1</text>
-              <text x="50" y="115" className="fill-green-400 text-xs">Onda 2</text>
-              <text x="50" y="130" className="fill-red-400 text-xs font-bold">Resultante</text>
             </svg>
           </div>
 
@@ -617,8 +623,7 @@ export default function TheoryPage() {
 
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
             <p className="text-sm text-cyan-300">
-              <strong>💡 Aplicación al simulador:</strong> En el Ejercicio 4 (Película Delgada), calculás el espesor mínimo <Formula math="t" /> 
-              de una burbuja de jabón (<Formula math="n = 1.33" />) para observar interferencia constructiva con luz de <Formula math="\lambda = 600 \text{ nm}" />.
+              <strong>💡 Aplicación al simulador:</strong> En el Ejercicio 4 (Película Delgada), calculás el espesor mínimo <Formula math="t" /> de una burbuja de jabón (<Formula math="n = 1.33" />) para observar interferencia constructiva con luz de <Formula math="\lambda = 600 \text{ nm}" />.
             </p>
           </div>
         </TheoryPanel>
@@ -713,8 +718,7 @@ export default function TheoryPage() {
 
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
             <p className="text-sm text-cyan-300">
-              <strong>💡 Aplicación al simulador:</strong> En el Ejercicio 5 (Distribución de Intensidad), visualizás esta curva <Formula math="\cos^2" /> 
-              en el gráfico de Recharts, con máximos y mínimos marcados, y comparás cómo cambia al modificar <Formula math="d" /> o <Formula math="\lambda" />.
+              <strong>💡 Aplicación al simulador:</strong> En el Ejercicio 5 (Distribución de Intensidad), visualizás esta curva <Formula math="\cos^2" /> en el gráfico interactivo de intensidad en función de la posición, con los máximos (líneas verdes) y mínimos (líneas rojas) marcados, y comparás cómo cambia el patrón al modificar <Formula math="d" /> o <Formula math="\lambda" />.
             </p>
           </div>
         </TheoryPanel>

@@ -138,7 +138,7 @@ export function PeliculaDelgadaPage({ exercise }: { exercise: Exercise }) {
               <strong className="text-cyan-400">Rayo transmitido y reflejado 2 (cyan):</strong> La parte interna (línea punteada) es la luz que atraviesa la película. El rayo que sale hacia arriba (línea continua cyan) es el que se refleja en la <strong>superficie inferior</strong> sin cambio de fase. En la realidad coincide en dirección con el rayo reflejado 1; se dibuja desplazado a la derecha solo para visualización.
             </li>
             <li>
-              <strong className="text-cyan-400">Indicador de espesor t:</strong> La línea vertical punteada a la derecha de la película con marcas en los extremos muestra el espesor <Formula math="t" /> de la película. Esta es la incógnita que estás calculando.
+              <strong className="text-cyan-400">Indicador de espesor t:</strong> La línea vertical punteada a la derecha de la película muestra el espesor <Formula math="t" />, con su <strong>valor numérico</strong> (ej: "t = 112.8 nm"). El grosor del rectángulo es proporcional a este valor: a mayor espesor, película más gruesa.
             </li>
           </ul>
 
@@ -147,7 +147,7 @@ export function PeliculaDelgadaPage({ exercise }: { exercise: Exercise }) {
           </p>
 
           <p className="text-sm leading-relaxed text-slate-400">
-            <strong className="text-slate-300">¿Qué observar cuando modificás los parámetros?</strong> Al aumentar el índice de refracción <Formula math="n" />, el espesor mínimo <Formula math="t" /> disminuye (la película puede ser más delgada). Al aumentar la longitud de onda <Formula math="\lambda" />, el espesor mínimo aumenta proporcionalmente. Al cambiar el orden <Formula math="m" /> de 0 a 1, 2, etc., calculás espesores mayores que también producen interferencia constructiva (múltiplos del espesor mínimo).
+            <strong className="text-slate-300">¿Qué observar cuando modificás los parámetros?</strong> El espesor se calcula como <Formula math="t = \frac{(m + \frac{1}{2})\lambda}{2n}" />. Al aumentar <Formula math="n" /> (índice de refracción), el espesor <Formula math="t" /> <strong>disminuye</strong> (película más delgada). Al aumentar <Formula math="\lambda" />, el espesor <strong>aumenta</strong> proporcionalmente. Al cambiar el orden <Formula math="m" /> de 0 a 1, 2, etc., el espesor <strong>aumenta</strong> en múltiplos del espesor mínimo (m=0 → 112.8 nm, m=1 → 338.3 nm, m=2 → 563.9 nm).
           </p>
 
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">

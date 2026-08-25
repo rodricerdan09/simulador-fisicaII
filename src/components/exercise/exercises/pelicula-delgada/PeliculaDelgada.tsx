@@ -31,7 +31,8 @@ export function PeliculaDelgada({
   const filmX = 150;
   const filmY = 220;
   const filmW = 340;
-  const filmH = Math.max(60, Math.min(100, tNm / 2));
+  // Espesor proporcional a t (nm), con mínimo/máximo para mantener visible en el viewBox
+  const filmH = Math.max(35, Math.min(200, tNm * 0.35));
   const centerX = filmX + filmW / 2;
   const topY = filmY;
   const bottomY = filmY + filmH;
@@ -184,9 +185,9 @@ export function PeliculaDelgada({
         <text
           x={filmX + filmW + 50}
           y={topY + filmH / 2 + 5}
-          style={{ fontSize: "16px", fontWeight: "bold", fill: "#a7bedf" }}
+          style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}
         >
-          t
+          t = {tNm.toFixed(1)} nm
         </text>
 
         {/* Etiquetas de rayos */}

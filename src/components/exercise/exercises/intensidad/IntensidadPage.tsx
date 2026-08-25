@@ -14,7 +14,7 @@ type ComparisonTab = "a" | "b" | "c";
 
 export function IntensidadPage({ exercise }: { exercise: Exercise }) {
   const [lambda, setLambda] = useState(580);
-  const [slitDistance, setSlitDistance] = useState(0.001);
+  const [slitDistance, setSlitDistance] = useState(1.0);
   const [screenDistance, setScreenDistance] = useState(1.0);
   const [intensityI0, setIntensityI0] = useState(1.0);
   const [tab, setTab] = useState<ComparisonTab>("a");
@@ -22,9 +22,9 @@ export function IntensidadPage({ exercise }: { exercise: Exercise }) {
   const results = computeIntensidad(lambda, slitDistance, screenDistance, intensityI0);
 
   const tabConfigs = {
-    a: { lambda: 580, slitDistance: 0.001, label: "a) λ=580nm, d=0.001m" },
-    b: { lambda: 580, slitDistance: 0.002, label: "b) λ=580nm, d=0.002m (d×2)" },
-    c: { lambda: 400, slitDistance: 0.001, label: "c) λ=400nm, d=0.001m" },
+    a: { lambda: 580, slitDistance: 1.0, label: "a) λ=580nm, d=1mm" },
+    b: { lambda: 580, slitDistance: 2.0, label: "b) λ=580nm, d=2mm (d×2)" },
+    c: { lambda: 400, slitDistance: 1.0, label: "c) λ=400nm, d=1mm" },
   };
 
   const handleTabChange = (newTab: ComparisonTab) => {
@@ -69,10 +69,10 @@ export function IntensidadPage({ exercise }: { exercise: Exercise }) {
           <ParameterControl
             label="Separación entre rendijas (d)"
             value={slitDistance}
-            min={0.0001}
-            max={0.005}
-            step={0.0001}
-            unit="m"
+            min={0.1}
+            max={5.0}
+            step={0.1}
+            unit="mm"
             onChange={setSlitDistance}
           />
           <ParameterControl

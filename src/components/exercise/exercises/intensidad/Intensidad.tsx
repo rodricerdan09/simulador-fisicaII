@@ -102,7 +102,7 @@ export function Intensidad({
       return { curveData: [], maximaData: [], minimaData: [] };
     }
 
-    const points = 1000;
+    const points = 300;
     const curveData = [];
     for (let i = 0; i <= points; i++) {
       const yM = ((i / points) * 2 - 1) * yRangeM;
