@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -39,14 +39,21 @@ export function Intensidad({
     return (lambdaM * LM) / dM;
   }, [lambdaM, LM, dM]);
 
-  const yMaxM = useMemo(() => {
-    if (fringeSpacingM === 0) return 0;
-    return 5 * fringeSpacingM;
+  // Rango dinámico: mostrar al menos 3 franjas a cada lado, pero con mínimo de 2mm
+  const yRangeM = useMemo(() => {
+    if (fringeSpacingM === 0) return 2e-3;
+    return Math.max(2e-3, 3 * fringeSpacingM);
   }, [fringeSpacingM]);
 
   const color = wavelengthToCss(lambdaNm);
 
-  // Draw the interference pattern on a horizontal canvas strip.
+  // Forzar re-renderizado del gráfico cuando cambien los parámetros
+  const [chartKey, setChartKey] = useState(0);
+  useEffect(() => {
+    setChartKey(prev => prev + 1);
+  }, [lambdaNm, slitDistanceMm, screenDistanceM, intensityI0]);
+
+  // Draw intensity pattern on canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -55,10 +62,7 @@ export function Intensidad({
 
     const width = canvas.width;
     const height = canvas.height;
-    const imageData = ctx.createImageData(width, height);
-    const data = imageData.data;
 
-    // Limpiar canvas
     ctx.clearRect(0, 0, width, height);
 
     if (dM === 0 || lambdaM === 0 || LM === 0) {
@@ -70,26 +74,27 @@ export function Intensidad({
     const gBase = rgbMatch ? parseInt(rgbMatch[2], 10) : 211;
     const bBase = rgbMatch ? parseInt(rgbMatch[3], 10) : 238;
 
+    // Draw intensity pattern as vertical fringes
     for (let x = 0; x < width; x++) {
-      const yM = ((x / width) * 2 - 1) * yMaxM;
+      const yM = ((x / width) * 2 - 1) * yRangeM;
       const phase = (Math.PI * dM * yM) / (lambdaM * LM);
       const intensity = I0 * Math.cos(phase) ** 2;
 
-      const r = Math.min(255, Math.round(rBase * intensity + 15 * (1 - intensity)));
-      const g = Math.min(255, Math.round(gBase * intensity + 23 * (1 - intensity)));
-      const b = Math.min(255, Math.round(bBase * intensity + 42 * (1 - intensity)));
-
-      for (let row = 0; row < height; row++) {
-        const idx = (row * width + x) * 4;
-        data[idx] = r;
-        data[idx + 1] = g;
-        data[idx + 2] = b;
-        data[idx + 3] = 255;
-      }
+      const brightness = Math.round(intensity * 255);
+      ctx.fillStyle = `rgb(${Math.round(rBase * intensity)}, ${Math.round(gBase * intensity)}, ${Math.round(bBase * intensity)})`;
+      ctx.fillRect(x, 0, 1, height);
     }
 
-    ctx.putImageData(imageData, 0, 0);
-  }, [lambdaM, dM, LM, I0, yMaxM, color]);
+    // Draw center line
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(width / 2, 0);
+    ctx.lineTo(width / 2, height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }, [lambdaM, dM, LM, I0, yRangeM, color]);
 
   // Data for the Recharts plot.
   const { curveData, maximaData, minimaData } = useMemo(() => {
@@ -97,10 +102,10 @@ export function Intensidad({
       return { curveData: [], maximaData: [], minimaData: [] };
     }
 
-    const points = 200;
+    const points = 1000;
     const curveData = [];
     for (let i = 0; i <= points; i++) {
-      const yM = ((i / points) * 2 - 1) * yMaxM;
+      const yM = ((i / points) * 2 - 1) * yRangeM;
       const phase = (Math.PI * dM * yM) / (lambdaM * LM);
       const intensity = I0 * Math.cos(phase) ** 2;
       curveData.push({ y: yM * 1000, I: intensity });
@@ -108,128 +113,132 @@ export function Intensidad({
 
     const maximaData = [];
     const minimaData = [];
-    const maxOrder = Math.floor(yMaxM / fringeSpacingM);
+    const maxOrder = Math.floor(yRangeM / fringeSpacingM);
     for (let m = -maxOrder; m <= maxOrder; m++) {
       const yMax = m * fringeSpacingM;
-      if (Math.abs(yMax) <= yMaxM * 1.01) {
+      if (Math.abs(yMax) <= yRangeM * 1.01) {
         maximaData.push({ y: yMax * 1000, I: I0 });
       }
       const yMin = (m + 0.5) * fringeSpacingM;
-      if (Math.abs(yMin) <= yMaxM * 1.01) {
+      if (Math.abs(yMin) <= yRangeM * 1.01) {
         minimaData.push({ y: yMin * 1000, I: 0 });
       }
     }
 
     return { curveData, maximaData, minimaData };
-  }, [lambdaM, dM, LM, I0, yMaxM, fringeSpacingM]);
+  }, [lambdaM, dM, LM, I0, yRangeM, fringeSpacingM]);
 
   return (
     <VisualizationCanvas title="Visualización: distribución de intensidad">
-      <div className="w-full space-y-4">
-        <canvas
-          ref={canvasRef}
-          width={640}
-          height={80}
-          className="h-auto w-full max-w-full md:max-w-xl mx-auto rounded-lg"
-          aria-label="Patrón de interferencia"
-        />
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <canvas
+            ref={canvasRef}
+            width={800}
+            height={150}
+            className="h-auto w-full rounded-lg"
+            aria-label="Patrón de intensidad"
+          />
 
-        <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              key={`chart-${lambdaNm}-${slitDistanceMm}-${screenDistanceM}-${intensityI0}`}
-              data={curveData}
-              margin={{ top: 10, right: 20, bottom: 10, left: 0 }}
-            >
-              <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" />
-              <XAxis
-                dataKey="y"
-                type="number"
-                domain={[-yMaxM * 1000, yMaxM * 1000]}
-                tick={{ fill: "#94a3b8", fontSize: 12 }}
-                stroke="#334155"
-                label={{
-                  value: "Posición y (mm)",
-                  position: "insideBottom",
-                  offset: -5,
-                  fill: "#94a3b8",
-                  fontSize: 12,
-                }}
-              />
-              <YAxis
-                tick={{ fill: "#94a3b8", fontSize: 12 }}
-                stroke="#334155"
-                domain={[0, Math.max(I0 * 1.05, 0.1)]}
-                label={{
-                  value: "Intensidad I",
-                  angle: -90,
-                  position: "insideLeft",
-                  fill: "#94a3b8",
-                  fontSize: 12,
-                }}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0f172a",
-                  borderColor: "#22d3ee",
-                  borderWidth: 1,
-                  color: "#f1f5f9",
-                  borderRadius: "8px",
-                }}
-                formatter={(value: number) => [value.toFixed(3), "Intensidad"]}
-                labelFormatter={(label: number) => `y = ${label.toFixed(2)} mm`}
-              />
-              <Line
-                type="monotone"
-                dataKey="I"
-                stroke="#3cc3d8"
-                strokeWidth={3}
-                dot={false}
-                isAnimationActive={false}
-              />
-              {/* Líneas de referencia para máximos */}
-              {maximaData.map((max, idx) => (
-                <ReferenceLine
-                  key={`max-${idx}`}
-                  x={max.y}
-                  stroke="#28f50c"
-                  strokeWidth={1}
-                  strokeDasharray="4 4"
-                  opacity={0.5}
+          <div className="mt-4">
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart
+                key={`chart-${chartKey}`}
+                data={curveData}
+                margin={{ top: 10, right: 20, bottom: 10, left: 0 }}
+              >
+                <defs>
+                  <linearGradient id="colorI" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#22d3ee" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="y"
+                  type="number"
+                  domain={[-yRangeM * 1000, yRangeM * 1000]}
+                  tick={{ fill: "#94a3b8", fontSize: 12 }}
+                  stroke="#334155"
+                  label={{
+                    value: "Posición y (mm)",
+                    position: "insideBottom",
+                    offset: -5,
+                    fill: "#94a3b8",
+                    fontSize: 12,
+                  }}
+                  ticks={[-yRangeM * 1000, -yRangeM * 500, 0, yRangeM * 500, yRangeM * 1000]}
                 />
-              ))}
-              {/* Líneas de referencia para mínimos */}
-              {minimaData.map((min, idx) => (
-                <ReferenceLine
-                  key={`min-${idx}`}
-                  x={min.y}
-                  stroke="#f43f5e"
-                  strokeWidth={1}
-                  strokeDasharray="4 4"
-                  opacity={0.5}
+                <YAxis
+                  tick={{ fill: "#94a3b8", fontSize: 12 }}
+                  stroke="#334155"
+                  domain={[0, I0 * 1.1]}
+                  label={{
+                    value: "Intensidad I",
+                    angle: -90,
+                    position: "insideLeft",
+                    fill: "#94a3b8",
+                    fontSize: 12,
+                  }}
                 />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#0f172a",
+                    borderColor: "#22d3ee",
+                    borderWidth: 1,
+                    color: "#f1f5f9",
+                    borderRadius: "8px",
+                  }}
+                  formatter={(value: number) => [value.toFixed(3), "Intensidad"]}
+                  labelFormatter={(label: number) => `y = ${label.toFixed(3)} mm`}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="I"
+                  stroke="#22d3ee"
+                  strokeWidth={2}
+                  fill="url(#colorI)"
+                />
+                {maximaData.map((max, idx) => (
+                  <ReferenceLine
+                    key={`max-${idx}`}
+                    x={max.y}
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    strokeDasharray="4 4"
+                  />
+                ))}
+                {minimaData.map((min, idx) => (
+                  <ReferenceLine
+                    key={`min-${idx}`}
+                    x={min.y}
+                    stroke="#f43f5e"
+                    strokeWidth={2}
+                    strokeDasharray="4 4"
+                  />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </div>
 
-      <div className="mt-4 grid w-full grid-cols-2 gap-3 text-center text-xs text-slate-400 sm:grid-cols-4">
-        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
-          <p className="text-slate-500">λ</p>
-          <p className="font-mono" style={{ color }}>{lambdaNm} nm</p>
-        </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
-          <p className="text-slate-500">d</p>
-          <p className="font-mono text-cyan-400">{slitDistanceMm.toFixed(4)} mm</p>
-        </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
-          <p className="text-slate-500">L</p>
-          <p className="font-mono text-cyan-400">{screenDistanceM.toFixed(2)} m</p>
-        </div>
-        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
-          <p className="text-slate-500">I₀</p>
-          <p className="font-mono text-cyan-400">{intensityI0.toFixed(1)}</p>
+        <div className="flex flex-col gap-3 w-32">
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2 text-center">
+            <p className="text-xs text-slate-500">λ</p>
+            <p className="font-mono text-sm" style={{ color }}>{lambdaNm} nm</p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2 text-center">
+            <p className="text-xs text-slate-500">d</p>
+            <p className="font-mono text-sm text-cyan-400">{slitDistanceMm.toFixed(4)} mm</p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2 text-center">
+            <p className="text-xs text-slate-500">L</p>
+            <p className="font-mono text-sm text-cyan-400">{screenDistanceM.toFixed(2)} m</p>
+          </div>
+          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2 text-center">
+            <p className="text-xs text-slate-500">I₀</p>
+            <p className="font-mono text-sm text-cyan-400">{intensityI0.toFixed(1)}</p>
+          </div>
         </div>
       </div>
     </VisualizationCanvas>
@@ -255,7 +264,8 @@ export function computeIntensidad(
 
   const fringeSpacing = (lambdaM * L) / dM;
   return [
-    { label: "Separación entre franjas", value: fringeSpacing * 1000, unit: "mm", precision: 2 },
-    { label: "Intensidad máxima", value: intensityI0, precision: 1 },
+    { label: "Separación entre franjas (Δy)", value: fringeSpacing, unit: "m", precision: 4, scientific: true },
+    { label: "Separación entre franjas (Δy)", value: fringeSpacing * 1000, unit: "mm", precision: 2 },
+    { label: "Intensidad máxima (I₀)", value: intensityI0, unit: "W/m²", precision: 1 },
   ];
 }
