@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { VisualizationCanvas } from "../VisualizationCanvas";
+import { VisualizationCanvas } from "../../VisualizationCanvas";
 import { wavelengthToCss } from "@/lib/physics/wavelengthToColor";
 
 interface ComparacionEspectrosProps {

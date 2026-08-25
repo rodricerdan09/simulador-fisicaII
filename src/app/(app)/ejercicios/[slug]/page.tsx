@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 
 import { EXERCISES } from "@/constants/exercises";
-import { DobleRendijaPage } from "@/components/exercise/exercises/DobleRendijaPage";
-import { ComparacionEspectrosPage } from "@/components/exercise/exercises/ComparacionEspectrosPage";
-import { MinimosPage } from "@/components/exercise/exercises/MinimosPage";
-import { PeliculaDelgadaPage } from "@/components/exercise/exercises/PeliculaDelgadaPage";
-import { IntensidadPage } from "@/components/exercise/exercises/IntensidadPage";
+import { DobleRendijaPage } from "@/components/exercise/exercises/doble-rendija";
+import { ComparacionEspectrosPage } from "@/components/exercise/exercises/comparacion-espectros";
+import { MinimosPage } from "@/components/exercise/exercises/minimos";
+import { PeliculaDelgadaPage } from "@/components/exercise/exercises/pelicula-delgada";
+import { IntensidadPage } from "@/components/exercise/exercises/intensidad";
 
 interface ExercisePageProps {
   params: { slug: string };

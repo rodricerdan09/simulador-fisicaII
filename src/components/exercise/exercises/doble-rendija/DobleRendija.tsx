@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { VisualizationCanvas } from "../VisualizationCanvas";
+import { VisualizationCanvas } from "../../VisualizationCanvas";
 import { wavelengthToCss } from "@/lib/physics/wavelengthToColor";
 
 interface DobleRendijaProps {
@@ -164,7 +164,7 @@ export function DobleRendija({
       <div className="flex items-center justify-center gap-1">
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          className="h-[270px] w-auto"
+          className="h-auto w-full max-w-full"
           aria-label="Doble rendija"
         >
           {/* Ondas desde rendija superior */}

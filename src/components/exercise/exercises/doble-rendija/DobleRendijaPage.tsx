@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ExerciseModule } from "../ExerciseModule";
-import { ParameterControl } from "../ParameterControl";
-import { ResultsPanel } from "../ResultsPanel";
-import { TheoryPanel } from "../TheoryPanel";
+import { ExerciseModule } from "../../ExerciseModule";
+import { ParameterControl } from "../../ParameterControl";
+import { ResultsPanel } from "../../ResultsPanel";
+import { TheoryPanel } from "../../TheoryPanel";
 import { DobleRendija, computeDobleRendija } from "./DobleRendija";
 import { Exercise } from "@/types";
 import { Formula } from "@/lib/katex/render";
@@ -156,7 +156,7 @@ export function DobleRendijaPage({ exercise }: { exercise: Exercise }) {
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
             <p className="text-sm text-cyan-300">
               <strong>📚 Para mayor detalle:</strong> Visitá la sección de{" "}
-              <a href="/teoria" className="font-semibold underline hover:text-cyan-200">
+              <a href="/teoria#young" className="font-semibold underline hover:text-cyan-200">
                 Teoría → El Experimento de Young y la Doble Rendija
               </a>{" "}
               donde encontrarás el desarrollo matemático completo, diagramas explicativos y videos recomendados sobre este fenómeno.

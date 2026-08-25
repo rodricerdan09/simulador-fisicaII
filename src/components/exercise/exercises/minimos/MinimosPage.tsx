@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ExerciseModule } from "../ExerciseModule";
-import { ParameterControl } from "../ParameterControl";
-import { ResultsPanel } from "../ResultsPanel";
-import { TheoryPanel } from "../TheoryPanel";
+import { ExerciseModule } from "../../ExerciseModule";
+import { ParameterControl } from "../../ParameterControl";
+import { ResultsPanel } from "../../ResultsPanel";
+import { TheoryPanel } from "../../TheoryPanel";
 import { Minimos, computeMinimos } from "./Minimos";
 import { Exercise } from "@/types";
 import { Formula } from "@/lib/katex/render";
@@ -168,7 +168,7 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
             <p className="text-sm text-cyan-300">
               <strong> Para mayor detalle:</strong> Visitá la sección de{" "}
-              <a href="/teoria" className="font-semibold underline hover:text-cyan-200">
+              <a href="/teoria#interferencia" className="font-semibold underline hover:text-cyan-200">
                 Teoría → Interferencia Constructiva y Destructiva
               </a>{" "}
               donde encontrarás la explicación matemática de cuándo se forman los mínimos (franjas oscuras) y cómo se relacionan con la diferencia de camino óptico.

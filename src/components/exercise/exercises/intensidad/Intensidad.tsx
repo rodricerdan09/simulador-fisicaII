@@ -11,7 +11,7 @@ import {
   Tooltip,
   ReferenceLine,
 } from "recharts";
-import { VisualizationCanvas } from "../VisualizationCanvas";
+import { VisualizationCanvas } from "../../VisualizationCanvas";
 import { wavelengthToCss } from "@/lib/physics/wavelengthToColor";
 
 interface IntensidadProps {

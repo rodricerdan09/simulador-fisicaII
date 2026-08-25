@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ExerciseModule } from "../ExerciseModule";
-import { ParameterControl } from "../ParameterControl";
-import { ResultsPanel } from "../ResultsPanel";
-import { TheoryPanel } from "../TheoryPanel";
+import { ExerciseModule } from "../../ExerciseModule";
+import { ParameterControl } from "../../ParameterControl";
+import { ResultsPanel } from "../../ResultsPanel";
+import { TheoryPanel } from "../../TheoryPanel";
 import { ComparacionEspectros, computeComparacionEspectros } from "./ComparacionEspectros";
 import { Exercise } from "@/types";
 import { Formula } from "@/lib/katex/render";
@@ -164,7 +164,7 @@ export function ComparacionEspectrosPage({ exercise }: { exercise: Exercise }) {
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
             <p className="text-sm text-cyan-300">
               <strong>📚 Para mayor detalle:</strong> Visitá la sección de{" "}
-              <a href="/teoria" className="font-semibold underline hover:text-cyan-200">
+              <a href="/teoria#naturaleza-ondulatoria" className="font-semibold underline hover:text-cyan-200">
                 Teoría → Naturaleza Ondulatoria y Longitud de Onda
               </a>{" "}
               donde encontrarás la explicación de cómo el color de la luz está determinado por su longitud de onda y cómo diferentes láseres generan patrones más anchos o más comprimidos.
