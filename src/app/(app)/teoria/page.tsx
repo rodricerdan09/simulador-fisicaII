@@ -1,5 +1,6 @@
 import { TheoryPanel } from "@/components/exercise/TheoryPanel";
 import { Formula } from "@/lib/katex/render";
+import { ScrollToHash } from "@/components/teoria/ScrollToHash";
 
 export const metadata = {
   title: "Teoría — Simulador Físico Universitario",
@@ -213,6 +214,7 @@ function DiagramaPeliculaDelgada() {
 export default function TheoryPage() {
   return (
     <div className="space-y-6 p-4 pb-12 md:p-6 md:pb-12">
+      <ScrollToHash />
       <header className="space-y-1 w-full">
         <h1 className="text-2xl font-bold text-slate-50 md:text-3xl">
           Teoría
@@ -225,7 +227,7 @@ export default function TheoryPage() {
 
       <div className="space-y-4">
         {/* Tarjeta 1: El Experimento de Young */}
-        <TheoryPanel title="1. El Experimento de Young y la Doble Rendija" defaultOpen>
+        <TheoryPanel id="young" title="1. El Experimento de Young y la Doble Rendija" defaultOpen>
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             Demostración histórica de la naturaleza ondulatoria de la luz
           </h3>
@@ -302,7 +304,7 @@ export default function TheoryPage() {
         </TheoryPanel>
 
         {/* Tarjeta 2: Naturaleza Ondulatoria y Longitud de Onda */}
-        <TheoryPanel title="2. Naturaleza Ondulatoria y Longitud de Onda">
+        <TheoryPanel id="naturaleza-ondulatoria" title="2. Naturaleza Ondulatoria y Longitud de Onda">
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             La relación entre color y longitud de onda
           </h3>
@@ -371,7 +373,7 @@ export default function TheoryPage() {
         </TheoryPanel>
 
         {/* Tarjeta 3: Interferencia Constructiva y Destructiva */}
-        <TheoryPanel title="3. Interferencia Constructiva y Destructiva">
+        <TheoryPanel id="interferencia" title="3. Interferencia Constructiva y Destructiva">
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             Diferencia de camino y desfasaje entre ondas
           </h3>
@@ -517,7 +519,7 @@ export default function TheoryPage() {
         </TheoryPanel>
 
         {/* Tarjeta 4: Interferencia en Películas Delgadas */}
-        <TheoryPanel title="4. Interferencia en Películas Delgadas">
+        <TheoryPanel id="pelicula-delgada" title="4. Interferencia en Películas Delgadas">
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             Colores iridiscentes en burbujas de jabón y manchas de aceite
           </h3>
@@ -622,7 +624,7 @@ export default function TheoryPage() {
         </TheoryPanel>
 
         {/* Tarjeta 5: Análisis de la Intensidad Luminosa */}
-        <TheoryPanel title="5. Análisis de la Intensidad Luminosa">
+        <TheoryPanel id="intensidad" title="5. Análisis de la Intensidad Luminosa">
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             Distribución de intensidad en el patrón de interferencia
           </h3>
