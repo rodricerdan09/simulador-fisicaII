@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 
 import { useUser } from "@/hooks/useUser";
 import { createClient } from "@/lib/supabase/client";
+import { isFeatureEnabled } from "@/lib/features";
 import { Profile, PageVisit } from "@/types";
 import { StudentFilter } from "./StudentFilter";
 import { StudentTable } from "./StudentTable";
@@ -35,6 +36,62 @@ export function TeacherDashboard() {
     let cancelled = false;
 
     async function fetchData() {
+      if (isFeatureEnabled("sqlite.enabled")) {
+        try {
+          const [studentsResponse, visitsResponse] = await Promise.all([
+            fetch("/api/students"),
+            fetch("/api/visits/stats"),
+          ]);
+
+          if (!studentsResponse.ok) {
+            throw new Error("Failed to load students");
+          }
+          if (!visitsResponse.ok) {
+            throw new Error("Failed to load visits");
+          }
+
+          const studentsData = (await studentsResponse.json()) as Array<{
+            id: number;
+            nombre: string;
+            apellido: string;
+            legajo: string;
+            carrera: string;
+            comision: string;
+          }>;
+
+          const visitsData = (await visitsResponse.json()) as {
+            visits: PageVisit[];
+          };
+
+          if (cancelled) return;
+
+          const mappedStudents: Profile[] = studentsData.map((student) => ({
+            id: String(student.id),
+            role: "alumno",
+            nombre: student.nombre,
+            apellido: student.apellido,
+            legajo: student.legajo ?? "",
+            carrera: student.carrera ?? "",
+            comision: student.comision ?? "",
+            created_at: new Date().toISOString(),
+          }));
+
+          setStudents(mappedStudents);
+          setVisits(visitsData.visits ?? []);
+        } catch (err) {
+          if (!cancelled) {
+            setError("No se pudieron cargar los datos del panel docente.");
+            console.error(err);
+          }
+        } finally {
+          if (!cancelled) {
+            setLoading(false);
+          }
+        }
+
+        return;
+      }
+
       const supabase = createClient();
 
       const [studentsResult, visitsResult] = await Promise.all([

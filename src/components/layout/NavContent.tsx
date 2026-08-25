@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Home,
   BookOpen,
@@ -10,9 +11,11 @@ import {
   Sun,
   Rainbow,
   FlaskConical,
+  LogIn,
 } from "lucide-react";
 
 import { useUser } from "@/hooks/useUser";
+import { getSesion, subscribeToRoleChange } from "@/lib/role";
 import { EXERCISES } from "@/constants/exercises";
 import { NavItem } from "./NavItem";
 import { BrandChip } from "./BrandChip";
@@ -35,6 +38,13 @@ interface NavContentProps {
 
 export function NavContent({ onClose }: NavContentProps) {
   const { profile } = useUser();
+  const [hasSesion, setHasSesion] = useState(false);
+
+  useEffect(() => {
+    const check = () => setHasSesion(Boolean(getSesion()));
+    check();
+    return subscribeToRoleChange(check);
+  }, []);
 
   return (
     <div className="flex h-full flex-col">
@@ -66,6 +76,14 @@ export function NavContent({ onClose }: NavContentProps) {
             href="/dashboard"
             icon={LayoutDashboard}
             label="Panel Docente"
+            onClick={onClose}
+          />
+        )}
+        {!hasSesion && (
+          <NavItem
+            href="/acceso"
+            icon={LogIn}
+            label="Ingresar"
             onClick={onClose}
           />
         )}

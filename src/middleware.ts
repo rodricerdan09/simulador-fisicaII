@@ -1,14 +1,26 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import features from "@/config/features.json";
+
+const supabaseEnabled = features.features.supabase.enabled;
+const loginEnabled = features.features.auth.login;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Rutas públicas que no requieren autenticación
+  // Si supabase/auth está deshabilitado, no verificar sesión
+  if (!supabaseEnabled || !loginEnabled) {
+    // Redirigir /login y /register al inicio
+    if (pathname === "/login" || pathname === "/register") {
+      const homeUrl = new URL("/inicio", request.url);
+      return NextResponse.redirect(homeUrl);
+    }
+    return NextResponse.next();
+  }
+
   const publicRoutes = ["/login", "/register"];
   const isPublicRoute = publicRoutes.some((route) => pathname === route);
 
-  // Crear cliente de Supabase para verificar sesión
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -23,13 +35,11 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Si no es ruta pública y no hay usuario, redirigir al login
   if (!isPublicRoute && !user) {
     const loginUrl = new URL("/login", request.url);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Si es ruta pública y hay usuario, redirigir al inicio
   if (isPublicRoute && user) {
     const homeUrl = new URL("/inicio", request.url);
     return NextResponse.redirect(homeUrl);
