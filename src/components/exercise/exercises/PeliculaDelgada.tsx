@@ -27,15 +27,19 @@ export function PeliculaDelgada({
   const color = wavelengthToCss(lambdaNm);
 
   const width = 640;
-  const height = 420;
-  const filmX = 120;
-  const filmY = 200;
-  const filmW = 400;
-  const filmH = Math.max(40, Math.min(120, tNm / 10));
+  const height = 450;
+  const filmX = 150;
+  const filmY = 220;
+  const filmW = 340;
+  const filmH = Math.max(60, Math.min(100, tNm / 2));
   const centerX = filmX + filmW / 2;
   const topY = filmY;
   const bottomY = filmY + filmH;
-  const rayOffset = 70; // separación horizontal entre rayos reflejados (solo visualización)
+  
+  // Desplazamiento horizontal pequeño para distinguir los rayos (pero todos van en dirección normal)
+  const incidentOffset = 0;
+  const reflected1Offset = -35;
+  const reflected2Offset = 35;
 
   return (
     <VisualizationCanvas title="Visualización: película delgada">
@@ -64,6 +68,9 @@ export function PeliculaDelgada({
         {/* Medio superior (aire) */}
         <rect x={0} y={0} width={width} height={filmY} fill="#0f172a" />
 
+        {/* Medio inferior (aire) */}
+        <rect x={0} y={bottomY} width={width} height={height - bottomY} fill="#0f172a" />
+
         {/* Película delgada */}
         <rect
           x={filmX}
@@ -82,21 +89,21 @@ export function PeliculaDelgada({
 
         {/* Rayo incidente (amarillo) — dirección normal hacia abajo */}
         <line
-          x1={centerX}
-          y1={40}
-          x2={centerX}
+          x1={centerX + incidentOffset}
+          y1={50}
+          x2={centerX + incidentOffset}
           y2={topY - 8}
           stroke="#fbbf24"
           strokeWidth={3}
           markerEnd="url(#arrowYellow)"
         />
 
-        {/* Rayo reflejado 1 (rojo) — misma dirección que el incidente pero hacia arriba, desplazado para visualización */}
+        {/* Rayo reflejado 1 (rojo) — sale hacia arriba con cambio de fase π, ligeramente desplazado */}
         <line
-          x1={centerX - rayOffset}
+          x1={centerX + reflected1Offset}
           y1={topY}
-          x2={centerX - rayOffset}
-          y2={50}
+          x2={centerX + reflected1Offset}
+          y2={60}
           stroke="#f43f5e"
           strokeWidth={3}
           markerEnd="url(#arrowRed)"
@@ -114,94 +121,87 @@ export function PeliculaDelgada({
           markerEnd="url(#arrowCyan)"
         />
 
-        {/* Rayo reflejado 2 (cyan) — reflejado en la superficie inferior sin cambio de fase, sale hacia arriba */}
+        {/* Rayo reflejado 2 (cyan) — reflejado en superficie inferior sin cambio de fase, sale hacia arriba */}
         <line
-          x1={centerX + rayOffset}
+          x1={centerX + reflected2Offset}
           y1={bottomY}
-          x2={centerX + rayOffset}
-          y2={50}
+          x2={centerX + reflected2Offset}
+          y2={60}
           stroke={color}
           strokeWidth={3}
           markerEnd="url(#arrowCyan)"
         />
 
         {/* Indicador de cambio de fase π en la reflexión superior */}
-        <g transform={`translate(${centerX - rayOffset - 30}, ${topY - 55})`}>
-          <text x={0} y={-7} textAnchor="middle" style={{ fontSize: "18px", fontWeight: "bold", fill: "#a7bedf" }}>
+        <g transform={`translate(${centerX + reflected1Offset - 15}, ${topY - 20})`}>
+          <text x={0} y={0} textAnchor="middle" style={{ fontSize: "16px", fontWeight: "bold", fill: "#f43f5e" }}>
             π
           </text>
-          <path
-            d="M-20,6 Q0,-12 20,6"
-            fill="none"
-            stroke="#a7bedf"
-            strokeWidth={2}
-          />
         </g>
 
-        {/* Indicador de recorrido óptico 2nt (línea vertical punteada dentro de la película) */}
+        {/* Indicador de espesor t (línea vertical punteada a la derecha de la película) */}
         <line
-          x1={filmX + filmW - 50}
+          x1={filmX + filmW + 30}
           y1={topY}
-          x2={filmX + filmW - 50}
+          x2={filmX + filmW + 30}
           y2={bottomY}
           stroke="#a7bedf"
           strokeWidth={1.5}
           strokeDasharray="4 3"
         />
         <line
-          x1={filmX + filmW - 58}
-          y1={topY + 10}
-          x2={filmX + filmW - 50}
+          x1={filmX + filmW + 24}
+          y1={topY + 8}
+          x2={filmX + filmW + 30}
           y2={topY}
           stroke="#a7bedf"
           strokeWidth={1.5}
         />
         <line
-          x1={filmX + filmW - 42}
-          y1={topY + 10}
-          x2={filmX + filmW - 50}
+          x1={filmX + filmW + 36}
+          y1={topY + 8}
+          x2={filmX + filmW + 30}
           y2={topY}
           stroke="#a7bedf"
           strokeWidth={1.5}
         />
         <line
-          x1={filmX + filmW - 58}
-          y1={bottomY - 10}
-          x2={filmX + filmW - 50}
+          x1={filmX + filmW + 24}
+          y1={bottomY - 8}
+          x2={filmX + filmW + 30}
           y2={bottomY}
           stroke="#a7bedf"
           strokeWidth={1.5}
         />
         <line
-          x1={filmX + filmW - 42}
-          y1={bottomY - 10}
-          x2={filmX + filmW - 50}
+          x1={filmX + filmW + 36}
+          y1={bottomY - 8}
+          x2={filmX + filmW + 30}
           y2={bottomY}
           stroke="#a7bedf"
           strokeWidth={1.5}
         />
         <text
-          x={filmX + filmW - 40}
-          y={topY + filmH / 2 + 6}
+          x={filmX + filmW + 50}
+          y={topY + filmH / 2 + 5}
           style={{ fontSize: "16px", fontWeight: "bold", fill: "#a7bedf" }}
         >
-          2nt
+          t
         </text>
 
-        {/* Etiquetas */}
-        <text x={centerX} y={30} textAnchor="middle" style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}>
+        {/* Etiquetas de rayos */}
+        <text x={centerX + incidentOffset} y={40} textAnchor="middle" style={{ fontSize: "13px", fontWeight: "bold", fill: "#fbbf24" }}>
           Incidente
         </text>
-        <text x={centerX - rayOffset - 40} y={45} textAnchor="middle" style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}>
-          Reflejada 1 (cambio π)
+        <text x={centerX + reflected1Offset - 8} y={50} textAnchor="end" style={{ fontSize: "12px", fontWeight: "bold", fill: "#f43f5e" }}>
+          Reflejado 1
         </text>
-        <text x={centerX + rayOffset + 40} y={45} textAnchor="middle" style={{ fontSize: "15px", fontWeight: "bold", fill: "#a7bedf" }}>
-          Reflejada 2
+        <text x={centerX + reflected2Offset + 8} y={50} textAnchor="start" style={{ fontSize: "12px", fontWeight: "bold", fill: color }}>
+          Reflejado 2
         </text>
-        <text x={centerX + rayOffset} y={bottomY + 35} textAnchor="middle" style={{ fontSize: "13px", fill: "#a7bedf" }}>
-          sin cambio de fase
-        </text>
-        <text x={filmX + filmW / 2} y={filmY + filmH + 22} textAnchor="middle" style={{ fontSize: "16px", fontWeight: "bold", fill: "#a7bedf" }}>
+
+        {/* Etiqueta de la película */}
+        <text x={filmX + filmW / 2} y={filmY + filmH + 25} textAnchor="middle" style={{ fontSize: "14px", fontWeight: "bold", fill: "#a7bedf" }}>
           Película (n = {n.toFixed(2)})
         </text>
       </svg>
