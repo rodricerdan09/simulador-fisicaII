@@ -4,9 +4,16 @@ import features from "@/config/features.json";
 
 const supabaseEnabled = features.features.supabase.enabled;
 const loginEnabled = features.features.auth.login;
+const laboratorioEnabled = features.features.laboratorio;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Bloquear acceso a rutas de features deshabilitadas
+  if (pathname.startsWith("/laboratorios") && !laboratorioEnabled) {
+    const homeUrl = new URL("/inicio", request.url);
+    return NextResponse.redirect(homeUrl);
+  }
 
   // Si supabase/auth está deshabilitado, no verificar sesión
   if (!supabaseEnabled || !loginEnabled) {

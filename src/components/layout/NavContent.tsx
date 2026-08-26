@@ -16,6 +16,7 @@ import {
 
 import { useUser } from "@/hooks/useUser";
 import { getSesion, subscribeToRoleChange } from "@/lib/role";
+import { isFeatureEnabled } from "@/lib/features";
 import { EXERCISES } from "@/constants/exercises";
 import { NavItem } from "./NavItem";
 import { BrandChip } from "./BrandChip";
@@ -65,12 +66,14 @@ export function NavContent({ onClose }: NavContentProps) {
           label="Teoría"
           onClick={onClose}
         />
-        <NavItem
-          href="/laboratorios"
-          icon={FlaskConical}
-          label="Laboratorios"
-          onClick={onClose}
-        />
+        {isFeatureEnabled("laboratorio") && (
+          <NavItem
+            href="/laboratorios"
+            icon={FlaskConical}
+            label="Laboratorios"
+            onClick={onClose}
+          />
+        )}
         {profile?.role === "profesor" && (
           <NavItem
             href="/dashboard"

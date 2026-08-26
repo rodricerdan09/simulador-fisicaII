@@ -1,6 +1,6 @@
 import features from "@/config/features.json";
 
-type FeatureKey = "auth.login" | "auth.register" | "supabase.enabled" | "sqlite.enabled" | "visitTracking";
+type FeatureKey = "auth.login" | "auth.register" | "supabase.enabled" | "sqlite.enabled" | "visitTracking" | "laboratorio";
 
 export function isFeatureEnabled(key: FeatureKey): boolean {
   const [section, field] = key.split(".") as [string, string];

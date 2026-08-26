@@ -7,6 +7,7 @@ import { Home, BookOpen, Zap, BarChart3, FlaskConical } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useUser } from "@/hooks/useUser";
+import { isFeatureEnabled } from "@/lib/features";
 
 interface NavItem {
   href: string;
@@ -18,7 +19,9 @@ const baseItems: NavItem[] = [
   { href: "/inicio", label: "Inicio", icon: Home },
   { href: "/teoria", label: "Teoría", icon: BookOpen },
   { href: "/ejercicios", label: "Ejercicios", icon: Zap },
-  { href: "/laboratorios", label: "Laboratorios", icon: FlaskConical },
+  ...(isFeatureEnabled("laboratorio")
+    ? [{ href: "/laboratorios", label: "Laboratorios", icon: FlaskConical }]
+    : []),
 ];
 
 function isActive(pathname: string, href: string): boolean {

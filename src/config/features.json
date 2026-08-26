@@ -10,6 +10,7 @@
     "sqlite": {
       "enabled": true
     },
-    "visitTracking": true
+    "visitTracking": true,
+    "laboratorio": false
   }
 }
