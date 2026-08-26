@@ -224,6 +224,13 @@ export function IntensidadPage({ exercise }: { exercise: Exercise }) {
           <p className="mt-4 text-sm text-slate-400">
             <strong className="text-slate-200">Resultado:</strong> La separación entre franjas consecutivas es <Formula math="\Delta y = 0.58 \text{ mm}" />. Los máximos ocurren en múltiplos enteros de este valor y los mínimos en múltiplos semi-enteros.
           </p>
+
+          <div className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
+            <p className="text-sm text-cyan-300">
+              <strong>📄 Resolución oficial:</strong> Podés consultar la resolución de este ejercicio en la plantilla de la cátedra{" "}
+              <a href="https://drive.google.com/file/d/14qatms-OPC5d4B67jUVNaoo4Cz6lRgkx/view" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-cyan-200">accediendo aquí</a>.
+            </p>
+          </div>
         </TheoryPanel>
       }
       context={

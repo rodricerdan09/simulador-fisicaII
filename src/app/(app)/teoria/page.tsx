@@ -1,6 +1,7 @@
 import { TheoryPanel } from "@/components/exercise/TheoryPanel";
 import { Formula } from "@/lib/katex/render";
 import { ScrollToHash } from "@/components/teoria/ScrollToHash";
+import { VideoEmbed } from "@/components/teoria/VideoEmbed";
 
 export const metadata = {
   title: "Teoría — Simulador Físico Universitario",
@@ -720,6 +721,38 @@ export default function TheoryPage() {
             <p className="text-sm text-cyan-300">
               <strong>💡 Aplicación al simulador:</strong> En el Ejercicio 5 (Distribución de Intensidad), visualizás esta curva <Formula math="\cos^2" /> en el gráfico interactivo de intensidad en función de la posición, con los máximos (líneas verdes) y mínimos (líneas rojas) marcados, y comparás cómo cambia el patrón al modificar <Formula math="d" /> o <Formula math="\lambda" />.
             </p>
+          </div>
+        </TheoryPanel>
+
+        {/* Tarjeta 6: Teoría de la Cátedra */}
+        <TheoryPanel id="teoria-catedra" title="6. Teoría de la Cátedra">
+          <p className="mb-3 text-slate-300 leading-relaxed">
+            Todo el contenido teórico de este simulador se desarrolló en base a los videos oficiales de la cátedra. 
+            Podés complementar y profundizar los conceptos vistos aquí repasando las explicaciones originales del docente, 
+            donde se desarrollan las fórmulas y se muestran simulaciones y diagramas paso a paso.
+          </p>
+
+          <div className="my-4 space-y-4">
+            <div>
+              <p className="mb-2 text-sm font-semibold text-cyan-400">
+                📺 Primera Parte — Superposición e interferencia
+              </p>
+              <VideoEmbed
+                videoId="zmsvKMjiJZk"
+                title="UT 12 Interferencia — Primera Parte"
+                duration="38:00"
+              />
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-semibold text-cyan-400">
+                📺 Segunda Parte — Distribución de intensidades
+              </p>
+              <VideoEmbed
+                videoId="QQhiJYbZaUU"
+                title="UT 12 Interferencia — Segunda Parte"
+                duration="30:00"
+              />
+            </div>
           </div>
         </TheoryPanel>
       </div>

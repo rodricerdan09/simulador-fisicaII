@@ -103,6 +103,13 @@ export function PeliculaDelgadaPage({ exercise }: { exercise: Exercise }) {
           <p className="mt-4 text-sm text-slate-400">
             <strong className="text-slate-200">Resultado:</strong> El espesor mínimo de la película de jabón para observar interferencia constructiva en la luz reflejada es <Formula math="t = 1.13 \times 10^{-7} \text{ m}" /> (aproximadamente <Formula math="113 \text{ nm}" />).
           </p>
+
+          <div className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
+            <p className="text-sm text-cyan-300">
+              <strong>📺 Explicación oficial:</strong> Podés complementar este desarrollo mirando el video de resolución de la cátedra{" "}
+              <a href="https://www.youtube.com/watch?v=EwdfplJiM_0" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-cyan-200">accediendo aquí</a>.
+            </p>
+          </div>
         </TheoryPanel>
       }
       context={

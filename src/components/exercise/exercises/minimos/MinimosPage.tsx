@@ -118,6 +118,13 @@ export function MinimosPage({ exercise }: { exercise: Exercise }) {
           <p className="mt-4 text-sm text-slate-400">
             <strong className="text-slate-200">Resultado:</strong> La longitud de onda de la luz es <Formula math="\lambda = 1.6 \times 10^{-6} \text{ m}" /> (equivalente a <Formula math="1600 \text{ nm}" />). Este valor corresponde a radiación infrarroja.
           </p>
+
+          <div className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
+            <p className="text-sm text-cyan-300">
+              <strong>📺 Explicación oficial:</strong> Podés complementar este desarrollo mirando el video de resolución de la cátedra{" "}
+              <a href="https://www.youtube.com/watch?v=DuTwwXkKp2k" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-cyan-200">accediendo aquí</a>.
+            </p>
+          </div>
         </TheoryPanel>
       }
       context={

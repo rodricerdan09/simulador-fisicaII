@@ -119,6 +119,13 @@ export function ComparacionEspectrosPage({ exercise }: { exercise: Exercise }) {
           <p className="mt-4 text-sm text-slate-400">
             <strong className="text-slate-200">Resultado:</strong> La separación entre las franjas brillantes de orden 3 es <Formula math="\Delta y = 14.4 \text{ mm}" />. La franja correspondiente a λ₂ (510 nm, verde) se encuentra más alejada del centro que la de λ₁ (430 nm, violeta).
           </p>
+
+          <div className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
+            <p className="text-sm text-cyan-300">
+              <strong>📺 Explicación oficial:</strong> Podés complementar este desarrollo mirando el video de resolución de la cátedra{" "}
+              <a href="https://www.youtube.com/watch?v=rbb42ebJG1c" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-cyan-200">accediendo aquí</a>.
+            </p>
+          </div>
         </TheoryPanel>
       }
       context={

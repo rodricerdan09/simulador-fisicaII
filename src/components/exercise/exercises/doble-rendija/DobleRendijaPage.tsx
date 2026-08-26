@@ -104,6 +104,13 @@ export function DobleRendijaPage({ exercise }: { exercise: Exercise }) {
           <p className="mt-4 text-sm text-slate-400">
             <strong className="text-slate-200">Resultado:</strong> La longitud de onda es <Formula math="\lambda = 562.5 \text{ nm}" /> (luz verde-amarilla) y la separación entre franjas brillantes consecutivas es <Formula math="\Delta y = 22.5 \text{ mm}" />.
           </p>
+
+          <div className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
+            <p className="text-sm text-cyan-300">
+              <strong>📺 Explicación oficial:</strong> Podés complementar este desarrollo mirando el video de resolución de la cátedra{" "}
+              <a href="https://www.youtube.com/watch?v=epL0Gomu0Vk" target="_blank" rel="noopener noreferrer" className="font-semibold underline hover:text-cyan-200">accediendo aquí</a>.
+            </p>
+          </div>
         </TheoryPanel>
       }
       context={
