@@ -137,47 +137,6 @@ export function IntensidadPage({ exercise }: { exercise: Exercise }) {
           <Formula math="I = I_{max} \cos^2\left(\frac{\pi d y}{\lambda L}\right)" block />
 
           <p className="mb-2 mt-4">
-            <strong className="text-slate-200">Interferencia de dos ondas:</strong>
-          </p>
-          <p className="mb-2 text-sm text-slate-400">
-            La siguiente imagen muestra cómo dos ondas individuales interfieren para producir la onda resultante en tres casos:
-          </p>
-          <ul className="mb-3 ml-4 list-disc text-sm text-slate-400">
-            <li><strong>φ = 0° (Constructiva):</strong> Las dos ondas están en fase y se suman, resultando en amplitud máxima.</li>
-            <li><strong>φ = 180° (Destructiva):</strong> Las dos ondas están en oposición de fase y se cancelan completamente.</li>
-            <li><strong>φ = 60° (Intermedia):</strong> Las dos ondas están parcialmente desfasadas, resultando en amplitud intermedia.</li>
-          </ul>
-          <div className="my-4 rounded-lg border border-slate-700 bg-slate-800/50 p-4">
-            <svg viewBox="0 0 600 400" className="w-full h-auto">
-              {/* Section 1: Constructive */}
-              <text x="100" y="20" textAnchor="middle" className="fill-slate-300 text-sm font-bold">φ = 0° (Constructiva)</text>
-              <line x1="0" y1="75" x2="200" y2="75" stroke="#475569" strokeWidth="1" />
-              <path d="M 0 75 Q 25 25, 50 75 T 100 75 T 150 75 T 200 75" fill="none" stroke="#3b82f6" strokeWidth="2" />
-              <path d="M 0 75 Q 25 25, 50 75 T 100 75 T 150 75 T 200 75" fill="none" stroke="#10b981" strokeWidth="2" />
-              <path d="M 0 75 Q 25 0, 50 75 T 100 75 T 150 75 T 200 75" fill="none" stroke="#ef4444" strokeWidth="3" />
-              
-              {/* Section 2: Destructive */}
-              <text x="300" y="20" textAnchor="middle" className="fill-slate-300 text-sm font-bold">φ = 180° (Destructiva)</text>
-              <line x1="200" y1="175" x2="400" y2="175" stroke="#475569" strokeWidth="1" />
-              <path d="M 200 175 Q 225 125, 250 175 T 300 175 T 350 175 T 400 175" fill="none" stroke="#3b82f6" strokeWidth="2" />
-              <path d="M 200 175 Q 225 225, 250 175 T 300 175 T 350 175 T 400 175" fill="none" stroke="#10b981" strokeWidth="2" />
-              <line x1="200" y1="175" x2="400" y2="175" stroke="#ef4444" strokeWidth="3" />
-              
-              {/* Section 3: Intermediate */}
-              <text x="500" y="20" textAnchor="middle" className="fill-slate-300 text-sm font-bold">φ = 60° (Intermedia)</text>
-              <line x1="400" y1="275" x2="600" y2="275" stroke="#475569" strokeWidth="1" />
-              <path d="M 400 275 Q 425 225, 450 275 T 500 275 T 550 275 T 600 275" fill="none" stroke="#3b82f6" strokeWidth="2" />
-              <path d="M 400 275 L 417 245 L 433 260 L 450 230 L 467 250 L 483 220 L 500 240 L 517 210 L 533 230 L 550 200 L 567 220 L 583 190 L 600 210" fill="none" stroke="#10b981" strokeWidth="2" />
-              <path d="M 400 275 Q 417 240, 433 255 T 467 240 T 500 255 T 533 240 T 567 255 T 600 240" fill="none" stroke="#ef4444" strokeWidth="3" />
-              
-              {/* Labels */}
-              <text x="50" y="100" className="fill-blue-400 text-xs">Onda 1</text>
-              <text x="50" y="115" className="fill-green-400 text-xs">Onda 2</text>
-              <text x="50" y="130" className="fill-red-400 text-xs font-bold">Resultante</text>
-            </svg>
-          </div>
-
-          <p className="mb-2 mt-4">
             <strong className="text-slate-200">Separación entre franjas:</strong>
           </p>
           <Formula math="\Delta y = \frac{\lambda L}{d}" block />
