@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
-import { getDatabase } from "@/lib/db/sqlite";
+import { getStudents } from "@/lib/db/sqlite";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-export function GET() {
+export async function GET() {
   try {
-    const db = getDatabase();
-    const rows = db
-      .prepare(
-        "SELECT id, nombre, apellido, legajo, carrera, comision FROM alumnos ORDER BY apellido, nombre"
-      )
-      .all();
+    const rows = await getStudents();
 
     return NextResponse.json(rows);
   } catch (error) {
