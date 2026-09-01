@@ -42,6 +42,8 @@ export default function AccesoPage() {
   const [regLegajo, setRegLegajo] = useState("");
   const [regCarrera, setRegCarrera] = useState("");
   const [regComision, setRegComision] = useState("");
+  const [regMode, setRegMode] = useState<LoginMode>("alumno");
+  const [regCode, setRegCode] = useState("");
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -52,7 +54,7 @@ export default function AccesoPage() {
       const body =
         loginMode === "alumno"
           ? { type: "alumno" as const, legajo: loginLegajo, apellido: loginApellido }
-          : { type: "profesor" as const, code: loginCode };
+          : { type: "profesor" as const, code: loginCode, apellido: loginApellido };
 
       const response = await fetch("/api/login", {
         method: "POST",
@@ -82,6 +84,30 @@ export default function AccesoPage() {
     setIsLoading(true);
 
     try {
+      if (regMode === "profesor") {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "profesor",
+            code: regCode,
+            nombre: regNombre,
+            apellido: regApellido,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error || "Error al registrarse");
+          return;
+        }
+
+        setSesion(data.sesion);
+        router.push("/inicio");
+        return;
+      }
+
       const registerResponse = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -225,17 +251,29 @@ export default function AccesoPage() {
                 </div>
               </>
             ) : (
-              <div className="space-y-1.5">
-                <Label htmlFor="code">Código de profesor</Label>
-                <Input
-                  id="code"
-                  type="password"
-                  value={loginCode}
-                  onChange={(e) => setLoginCode(e.target.value)}
-                  placeholder="Código Docente"
-                  required
-                />
-              </div>
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-apellido">Apellido</Label>
+                  <Input
+                    id="login-apellido"
+                    value={loginApellido}
+                    onChange={(e) => setLoginApellido(e.target.value)}
+                    placeholder="Tu apellido"
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="code">Código Docente</Label>
+                  <Input
+                    id="code"
+                    type="password"
+                    value={loginCode}
+                    onChange={(e) => setLoginCode(e.target.value)}
+                    placeholder="Ingrese el código docente"
+                    required
+                  />
+                </div>
+              </>
             )}
 
             {error && <p className="text-sm text-red-400">{error}</p>}
@@ -250,6 +288,37 @@ export default function AccesoPage() {
           </form>
         ) : (
           <form onSubmit={handleRegister} className="space-y-4">
+            <div className="grid grid-cols-2 gap-2 rounded-lg border border-slate-800 bg-slate-950/50 p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setRegMode("alumno");
+                  setError(null);
+                }}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  regMode === "alumno"
+                    ? "bg-slate-800 text-slate-50"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                Alumno
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setRegMode("profesor");
+                  setError(null);
+                }}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  regMode === "profesor"
+                    ? "bg-slate-800 text-slate-50"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                Docente
+              </button>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="nombre">Nombre</Label>
@@ -273,56 +342,72 @@ export default function AccesoPage() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="reg-legajo">Legajo</Label>
-              <Input
-                id="reg-legajo"
-                value={regLegajo}
-                onChange={(e) => setRegLegajo(e.target.value)}
-                placeholder="Ej: 12345"
-                required
-              />
-            </div>
+            {regMode === "alumno" ? (
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="reg-legajo">Legajo</Label>
+                  <Input
+                    id="reg-legajo"
+                    value={regLegajo}
+                    onChange={(e) => setRegLegajo(e.target.value)}
+                    placeholder="Ej: 12345"
+                    required
+                  />
+                </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="carrera">Carrera</Label>
-              <Select
-                value={regCarrera}
-                onValueChange={setRegCarrera}
-                required
-              >
-                <SelectTrigger id="carrera">
-                  <SelectValue placeholder="Seleccioná una carrera" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CARRERAS.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="carrera">Carrera</Label>
+                  <Select
+                    value={regCarrera}
+                    onValueChange={setRegCarrera}
+                    required
+                  >
+                    <SelectTrigger id="carrera">
+                      <SelectValue placeholder="Seleccioná una carrera" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CARRERAS.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="comision">Comisión</Label>
-              <Select
-                value={regComision}
-                onValueChange={setRegComision}
-                required
-              >
-                <SelectTrigger id="comision">
-                  <SelectValue placeholder="Seleccioná una comisión" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COMISIONES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="comision">Comisión</Label>
+                  <Select
+                    value={regComision}
+                    onValueChange={setRegComision}
+                    required
+                  >
+                    <SelectTrigger id="comision">
+                      <SelectValue placeholder="Seleccioná una comisión" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COMISIONES.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-1.5">
+                <Label htmlFor="reg-code">Código Docente</Label>
+                <Input
+                  id="reg-code"
+                  type="password"
+                  value={regCode}
+                  onChange={(e) => setRegCode(e.target.value)}
+                  placeholder="Ingrese el código docente"
+                  required
+                />
+              </div>
+            )}
 
             {error && <p className="text-sm text-red-400">{error}</p>}
 

@@ -12,7 +12,7 @@ Permite a los estudiantes explorar fenómenos ópticos reales con representacion
 - **Lenguaje:** TypeScript 5.5
 - **Estilos:** Tailwind CSS 3.4 + [shadcn/ui](https://ui.shadcn.com/) (base-nova)
 - **Componentes base:** `@base-ui/react` (Base UI) + Radix UI
-- **Persistencia:** [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) (base de datos local SQLite)
+- **Persistencia:** [Turso](https://turso.tech/) — libSQL (SQLite-compatible) alojado, vía `@libsql/client`
 - **Gráficos:** [Recharts](https://recharts.org/)
 - **Renderizado matemático:** [KaTeX](https://katex.org/)
 - **Testing:** [Vitest](https://vitest.dev/) + React Testing Library
@@ -22,7 +22,7 @@ Permite a los estudiantes explorar fenómenos ópticos reales con representacion
 
 ## Características principales
 
-- 🔐 **Autenticación local con roles:** Registro de Alumnos (nombre, apellido, legajo, carrera y comisión) e ingreso de Docentes mediante **código de profesor** (configurable). Los roles se gestionan sin depender de servicios externos.
+- 🔐 **Autenticación con roles:** Registro de Alumnos (nombre, apellido, legajo, carrera y comisión) y de Docentes (nombre, apellido y **Código Docente**). El código docente se configura por variable de entorno y valida el acceso al rol de profesor.
 - 🔬 **Cinco simulaciones interactivas de alta fidelidad:**
   1. **Doble Rendija:** Frentes de onda interactivos, patrón de interferencia con envolvente de difracción, cálculo de longitud de onda y separación de franjas.
   2. **Comparación de Espectros:** Dos longitudes de onda superpuestas, con orden de franja seleccionable independientemente para cada onda.
@@ -39,7 +39,7 @@ Permite a los estudiantes explorar fenómenos ópticos reales con representacion
 
 ## Requisitos previos
 
-- Node.js 18+ o superior
+- Node.js 20.6+ o superior (requerido por el flag `--env-file` del script de seed)
 
 ---
 
@@ -50,20 +50,31 @@ Permite a los estudiantes explorar fenómenos ópticos reales con representacion
    npm install
    ```
 
-2. **Configurar código de docente (opcional):**
-   La aplicación usa `PROFESSOR_CODE` (variable de entorno) para el ingreso de docentes. Si no está definida, usa el valor por defecto `utn2026`. Podés definirla en `.env.local`:
-   ```env
-   PROFESSOR_CODE=tu-codigo-secreto
+2. **Crear la base de datos en Turso** (una sola vez):
+   ```bash
+   turso auth login
+   turso db create simulador
+   turso db tokens create simulador
    ```
 
-3. **Iniciar servidor de desarrollo:**
+3. **Configurar variables de entorno** en `.env.local`:
+   ```env
+   TURSO_DATABASE_URL=libsql://tu-base.turso.io
+   TURSO_AUTH_TOKEN=tu-token
+   PROFESSOR_CODE=tu-codigo-secreto
+   ```
+   > `PROFESSOR_CODE` es **obligatorio** (no hay valor por defecto). Es el código con el que los docentes ingresan al rol de profesor.
+
+4. **Sembrar la base de datos** (crea el esquema y carga alumnos de ejemplo):
+   ```bash
+   npm run db:seed
+   ```
+
+5. **Iniciar servidor de desarrollo:**
    ```bash
    npm run dev
    ```
    Abrí [http://localhost:3000](http://localhost:3000) en tu navegador.
-
-4. **Base de datos SQLite:**
-   La base de datos se crea automáticamente en `data/simulador.db` al primer arranque, con alumnos de ejemplo precargados.
 
 ---
 
@@ -75,10 +86,10 @@ Las funcionalidades se activan/desactivan en `src/config/features.json`:
 |------|-------------|-------------------|
 | `auth.login` | Habilitar inicio de sesión | `false` |
 | `auth.register` | Habilitar registro | `false` |
-| `supabase.enabled` | Usar Supabase (en vez de SQLite) | `false` |
-| `sqlite.enabled` | Usar SQLite | `true` |
 | `visitTracking` | Registrar visitas | `true` |
 | `laboratorio` | Mostrar sección Laboratorios | `false` |
+
+> Los flags `supabase.enabled` y `sqlite.enabled` son legacy: la persistencia actual es **Turso (libSQL)**.
 
 > Las rutas de funcionalidades deshabilitadas están protegidas en el middleware (redirigen a `/inicio`).
 
@@ -94,6 +105,7 @@ Las funcionalidades se activan/desactivan en `src/config/features.json`:
 | `npm run lint` | Ejecuta chequeos de sintaxis con ESLint |
 | `npm test` | Ejecuta tests en modo watch |
 | `npm run test:run` | Ejecuta tests una sola vez |
+| `npm run db:seed` | Crea el esquema y siembra datos de ejemplo en Turso |
 
 Chequeo de tipos:
 ```bash
@@ -102,16 +114,22 @@ npx tsc --noEmit
 
 ---
 
-## Docker
+## Deploy en Vercel
 
-La aplicación incluye un `Dockerfile` multi-etapa (producción con `output: standalone`):
+La aplicación está preparada para [Vercel](https://vercel.com/) con persistencia en **Turso**:
 
-```bash
-docker build -t simulador-fisica .
-docker run -p 3000:3000 simulador-fisica
-```
+1. Conectá el repositorio en Vercel (rama de producción).
+2. Agregá las variables de entorno del proyecto:
+   - `TURSO_DATABASE_URL`
+   - `TURSO_AUTH_TOKEN`
+   - `PROFESSOR_CODE`
+3. Ejecutá el seed una vez contra la base remota:
+   ```bash
+   npm run db:seed
+   ```
+4. Pusheá los cambios para que Vercel haga el deploy automático.
 
-El volumen `data/` (base de datos SQLite) se crea dentro del contenedor.
+> Turso funciona en serverless porque es una base alojada (HTTP), a diferencia de `better-sqlite3` que requiere un filesystem persistente.
 
 ---
 
@@ -130,7 +148,7 @@ npm run test:run
 
 ## Seguridad
 
-- **Roles protegidos**: El acceso al rol de docente requiere el código `PROFESSOR_CODE`.
+- **Roles protegidos**: El acceso al rol de docente requiere el código `PROFESSOR_CODE` (obligatorio, sin valor por defecto).
 - **Rutas protegidas**: Las rutas de funcionalidades deshabilitadas (feature flags) se bloquean en el middleware.
 - **Visitas solo de alumnos**: El contador no registra visitas de docentes ni invitados.
 - **Guard de autenticación**: Los usuarios invitados son redirigidos a la pantalla de acceso.

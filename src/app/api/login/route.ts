@@ -10,6 +10,7 @@ export async function POST(request: Request) {
       legajo?: string;
       apellido?: string;
       code?: string;
+      nombre?: string;
     };
 
     const { type } = body;
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
         );
       }
 
-      const alumno = getAlumnoByLegajo(legajo);
+      const alumno = await getAlumnoByLegajo(legajo);
 
       if (!alumno) {
         return NextResponse.json(
@@ -56,12 +57,27 @@ export async function POST(request: Request) {
     }
 
     if (type === "profesor") {
-      const professorCode = process.env.PROFESSOR_CODE || "utn2026";
+      const professorCode = process.env.PROFESSOR_CODE;
+      if (!professorCode) {
+        return NextResponse.json(
+          { error: "Código Docente no configurado en el servidor" },
+          { status: 500 }
+        );
+      }
+
+      const apellido = body.apellido?.trim();
+      if (!apellido) {
+        return NextResponse.json(
+          { error: "El apellido es obligatorio" },
+          { status: 400 }
+        );
+      }
+
       const providedCode = body.code?.trim();
 
       if (providedCode !== professorCode) {
         return NextResponse.json(
-          { error: "Código de profesor incorrecto" },
+          { error: "Código Docente incorrecto" },
           { status: 401 }
         );
       }
@@ -70,6 +86,8 @@ export async function POST(request: Request) {
         success: true,
         sesion: {
           role: "profesor",
+          nombre: body.nombre?.trim() || undefined,
+          apellido,
         },
       });
     }

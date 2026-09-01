@@ -1,37 +1,12 @@
 import { NextResponse } from "next/server";
-import { getDatabase } from "@/lib/db/sqlite";
+import { getVisitsWithAlumno } from "@/lib/db/sqlite";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-interface VisitRow {
-  id: number;
-  page_path: string;
-  user_id: number | null;
-  visited_at: string;
-  carrera: string | null;
-  comision: string | null;
-}
-
-export function GET() {
+export async function GET() {
   try {
-    const db = getDatabase();
-
-    const visitRows = db
-      .prepare(
-        `
-        SELECT
-          v.id,
-          v.page_path,
-          v.alumno_id AS user_id,
-          v.visited_at,
-          a.carrera,
-          a.comision
-        FROM visitas v
-        LEFT JOIN alumnos a ON v.alumno_id = a.id
-        ORDER BY v.visited_at DESC
-        `
-      )
-      .all() as VisitRow[];
+    const visitRows = await getVisitsWithAlumno();
 
     const visits = visitRows.map((row) => ({
       id: String(row.id),

@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const existing = getAlumnoByLegajo(legajo);
+    const existing = await getAlumnoByLegajo(legajo);
     if (existing) {
       return NextResponse.json(
         { error: "El legajo ya está registrado" },
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const alumno = insertAlumno({
+    const alumno = await insertAlumno({
       nombre,
       apellido,
       legajo,

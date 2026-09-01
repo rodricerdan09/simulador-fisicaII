@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    container_name: simulador-fisica
+    ports:
+      - "3000:3000"
+    environment:
+      # Código secreto para cambiar de rol alumno -> profesor (server-side).
+      # Se carga desde el archivo .env (no versionado). No uses valores por defecto.
+      PROFESSOR_CODE: ${PROFESSOR_CODE}
+    volumes:
+      # Volumen nombrado persistente para la base SQLite (sobrevive a recrear el contenedor)
+      - simulador-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  simulador-data:
