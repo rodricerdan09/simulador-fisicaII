@@ -35,13 +35,16 @@ export async function GET() {
       byPage.set(visit.page_path, (byPage.get(visit.page_path) ?? 0) + 1);
     }
 
-    return NextResponse.json({
-      visits,
-      byAlumno: Object.fromEntries(byAlumno),
-      byCarrera: Object.fromEntries(byCarrera),
-      byComision: Object.fromEntries(byComision),
-      byPage: Object.fromEntries(byPage),
-    });
+    return NextResponse.json(
+      {
+        visits,
+        byAlumno: Object.fromEntries(byAlumno),
+        byCarrera: Object.fromEntries(byCarrera),
+        byComision: Object.fromEntries(byComision),
+        byPage: Object.fromEntries(byPage),
+      },
+      { headers: { "Cache-Control": "no-store, max-age=0" } }
+    );
   } catch (error) {
     console.error("GET /api/visits/stats error:", error);
     return NextResponse.json(
