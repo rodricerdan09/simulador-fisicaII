@@ -65,6 +65,14 @@ export async function POST(request: Request) {
         );
       }
 
+      const apellido = body.apellido?.trim();
+      if (!apellido) {
+        return NextResponse.json(
+          { error: "El apellido es obligatorio" },
+          { status: 400 }
+        );
+      }
+
       const providedCode = body.code?.trim();
 
       if (providedCode !== professorCode) {
@@ -79,7 +87,7 @@ export async function POST(request: Request) {
         sesion: {
           role: "profesor",
           nombre: body.nombre?.trim() || undefined,
-          apellido: body.apellido?.trim() || undefined,
+          apellido,
         },
       });
     }
