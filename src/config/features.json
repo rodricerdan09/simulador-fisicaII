@@ -1,0 +1,16 @@
+{
+  "features": {
+    "auth": {
+      "login": false,
+      "register": false
+    },
+    "supabase": {
+      "enabled": false
+    },
+    "sqlite": {
+      "enabled": true
+    },
+    "visitTracking": true,
+    "laboratorio": false
+  }
+}
