@@ -6,6 +6,7 @@ import { ChevronDown, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface TheoryPanelProps {
+  id?: string;
   title?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
@@ -13,6 +14,7 @@ export interface TheoryPanelProps {
 }
 
 export function TheoryPanel({
+  id,
   title = "Desarrollo del Ejercicio",
   children,
   defaultOpen = false,
@@ -29,8 +31,19 @@ export function TheoryPanel({
     onOpenChange?.(open);
   }, [open, onOpenChange]);
 
+  // Si la URL tiene un hash que coincide con este panel, abrirlo
+  useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+    if (window.location.hash === `#${id}`) {
+      setOpen(true);
+    }
+  }, [id]);
+
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-md">
+    <div
+      id={id}
+      className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-md"
+    >
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -47,18 +60,13 @@ export function TheoryPanel({
           )}
         />
       </button>
-      <div
-        className={cn(
-          "grid transition-all duration-200",
-          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        )}
-      >
-        <div className="overflow-hidden">
-          <div className="border-t border-slate-800 px-4 py-4 text-sm leading-relaxed text-slate-300">
+      {open && (
+        <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="overflow-hidden border-t border-slate-800 px-4 py-4 text-sm leading-relaxed text-slate-300">
             {children}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

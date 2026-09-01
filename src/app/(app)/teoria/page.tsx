@@ -1,5 +1,7 @@
 import { TheoryPanel } from "@/components/exercise/TheoryPanel";
 import { Formula } from "@/lib/katex/render";
+import { ScrollToHash } from "@/components/teoria/ScrollToHash";
+import { VideoEmbed } from "@/components/teoria/VideoEmbed";
 
 export const metadata = {
   title: "Teoría — Simulador Físico Universitario",
@@ -204,7 +206,7 @@ function DiagramaPeliculaDelgada() {
         <text x="495" y="135" className="fill-amber-300" fontSize="14" fontWeight="bold">t</text>
       </svg>
       <p className="text-center text-xs text-slate-400 mt-2">
-        Interferencia en película delgada: el rayo 1 sufre inversión de fase (π), el rayo 2 no
+        Interferencia en película delgada: el rayo 1 se refleja en la superficie superior con inversión de fase (π); el rayo 2 atraviesa la película, se refleja en la superficie inferior sin cambio de fase y recorre una distancia extra de 2nt.
       </p>
     </div>
   );
@@ -213,6 +215,7 @@ function DiagramaPeliculaDelgada() {
 export default function TheoryPage() {
   return (
     <div className="space-y-6 p-4 pb-12 md:p-6 md:pb-12">
+      <ScrollToHash />
       <header className="space-y-1 w-full">
         <h1 className="text-2xl font-bold text-slate-50 md:text-3xl">
           Teoría
@@ -225,7 +228,7 @@ export default function TheoryPage() {
 
       <div className="space-y-4">
         {/* Tarjeta 1: El Experimento de Young */}
-        <TheoryPanel title="1. El Experimento de Young y la Doble Rendija" defaultOpen>
+        <TheoryPanel id="young" title="1. El Experimento de Young y la Doble Rendija" defaultOpen>
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             Demostración histórica de la naturaleza ondulatoria de la luz
           </h3>
@@ -302,7 +305,7 @@ export default function TheoryPage() {
         </TheoryPanel>
 
         {/* Tarjeta 2: Naturaleza Ondulatoria y Longitud de Onda */}
-        <TheoryPanel title="2. Naturaleza Ondulatoria y Longitud de Onda">
+        <TheoryPanel id="naturaleza-ondulatoria" title="2. Naturaleza Ondulatoria y Longitud de Onda">
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             La relación entre color y longitud de onda
           </h3>
@@ -371,7 +374,7 @@ export default function TheoryPage() {
         </TheoryPanel>
 
         {/* Tarjeta 3: Interferencia Constructiva y Destructiva */}
-        <TheoryPanel title="3. Interferencia Constructiva y Destructiva">
+        <TheoryPanel id="interferencia" title="3. Interferencia Constructiva y Destructiva">
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             Diferencia de camino y desfasaje entre ondas
           </h3>
@@ -431,6 +434,74 @@ export default function TheoryPage() {
           </div>
 
           <h4 className="text-base font-semibold text-slate-50 mt-4 mb-2">
+            Distribución de intensidad
+          </h4>
+
+          <p className="mb-3 text-slate-300 leading-relaxed">
+            La intensidad de la luz en un punto de la pantalla es proporcional al cuadrado de la amplitud del campo eléctrico resultante. 
+            Cuando dos ondas de igual amplitud <Formula math="E_0" /> interfieren con un desfase <Formula math="\phi" />, la amplitud resultante es:
+          </p>
+
+          <Formula math="E_p = 2E_0 \cos\left(\frac{\phi}{2}\right)" block />
+
+          <p className="mb-3 text-slate-300 leading-relaxed">
+            Por lo tanto, la intensidad es:
+          </p>
+
+          <Formula math="I = I_{max} \cos^2\left(\frac{\phi}{2}\right)" block />
+
+          <p className="mb-3 text-slate-300 leading-relaxed">
+            donde <Formula math="I_{max} = 2E_0^2" /> es la intensidad máxima. El desfase <Formula math="\phi" /> está relacionado con la diferencia de camino <Formula math="\delta" /> por:
+          </p>
+
+          <Formula math="\phi = \frac{2\pi}{\lambda} \delta = \frac{2\pi}{\lambda} d \sin(\theta)" block />
+
+          <p className="mb-3 text-slate-300 leading-relaxed">
+            Para ángulos pequeños (<Formula math="\sin(\theta) \approx y/L" />):
+          </p>
+
+          <Formula math="I = I_{max} \cos^2\left(\frac{\pi d y}{\lambda L}\right)" block />
+
+          <div className="my-4 rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+            <p className="text-sm text-slate-300 mb-2">
+              <strong className="text-cyan-400">Visualización de la interferencia de dos ondas:</strong>
+            </p>
+            <div className="mb-3 flex flex-wrap items-center gap-4 text-xs">
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-0.5 w-6 bg-blue-500" /> Onda 1
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-0.5 w-6 bg-green-500" /> Onda 2
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-0.5 w-6 bg-red-500" /> Resultante
+              </span>
+            </div>
+            <svg viewBox="0 0 600 300" className="mx-auto w-full max-w-md h-auto">
+              {/* Section 1: Constructive */}
+              <text x="100" y="20" textAnchor="middle" className="fill-slate-300 text-sm font-bold">φ = 0° (Constructiva)</text>
+              <line x1="0" y1="75" x2="200" y2="75" stroke="#475569" strokeWidth="1" />
+              <path d="M 0 75 Q 25 25, 50 75 T 100 75 T 150 75 T 200 75" fill="none" stroke="#3b82f6" strokeWidth="2" />
+              <path d="M 0 75 Q 25 25, 50 75 T 100 75 T 150 75 T 200 75" fill="none" stroke="#10b981" strokeWidth="2" />
+              <path d="M 0 75 Q 25 0, 50 75 T 100 75 T 150 75 T 200 75" fill="none" stroke="#ef4444" strokeWidth="3" />
+              
+              {/* Section 2: Destructive */}
+              <text x="300" y="20" textAnchor="middle" className="fill-slate-300 text-sm font-bold">φ = 180° (Destructiva)</text>
+              <line x1="200" y1="175" x2="400" y2="175" stroke="#475569" strokeWidth="1" />
+              <path d="M 200 175 Q 225 125, 250 175 T 300 175 T 350 175 T 400 175" fill="none" stroke="#3b82f6" strokeWidth="2" />
+              <path d="M 200 175 Q 225 225, 250 175 T 300 175 T 350 175 T 400 175" fill="none" stroke="#10b981" strokeWidth="2" />
+              <line x1="200" y1="175" x2="400" y2="175" stroke="#ef4444" strokeWidth="3" />
+              
+              {/* Section 3: Intermediate */}
+              <text x="500" y="20" textAnchor="middle" className="fill-slate-300 text-sm font-bold">φ = 60° (Intermedia)</text>
+              <line x1="400" y1="275" x2="600" y2="275" stroke="#475569" strokeWidth="1" />
+              <path d="M 400 275 Q 425 225, 450 275 T 500 275 T 550 275 T 600 275" fill="none" stroke="#3b82f6" strokeWidth="2" />
+              <path d="M 400 275 L 417 245 L 433 260 L 450 230 L 467 250 L 483 220 L 500 240 L 517 210 L 533 230 L 550 200 L 567 220 L 583 190 L 600 210" fill="none" stroke="#10b981" strokeWidth="2" />
+              <path d="M 400 275 Q 417 240, 433 255 T 467 240 T 500 255 T 533 240 T 567 255 T 600 240" fill="none" stroke="#ef4444" strokeWidth="3" />
+            </svg>
+          </div>
+
+          <h4 className="text-base font-semibold text-slate-50 mt-4 mb-2">
             Cálculo de la posición de mínimos
           </h4>
 
@@ -455,7 +526,7 @@ export default function TheoryPage() {
         </TheoryPanel>
 
         {/* Tarjeta 4: Interferencia en Películas Delgadas */}
-        <TheoryPanel title="4. Interferencia en Películas Delgadas">
+        <TheoryPanel id="pelicula-delgada" title="4. Interferencia en Películas Delgadas">
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             Colores iridiscentes en burbujas de jabón y manchas de aceite
           </h3>
@@ -553,14 +624,13 @@ export default function TheoryPage() {
 
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
             <p className="text-sm text-cyan-300">
-              <strong>💡 Aplicación al simulador:</strong> En el Ejercicio 4 (Película Delgada), calculás el espesor mínimo <Formula math="t" /> 
-              de una burbuja de jabón (<Formula math="n = 1.33" />) para observar interferencia constructiva con luz de <Formula math="\lambda = 600 \text{ nm}" />.
+              <strong>💡 Aplicación al simulador:</strong> En el Ejercicio 4 (Película Delgada), calculás el espesor mínimo <Formula math="t" /> de una burbuja de jabón (<Formula math="n = 1.33" />) para observar interferencia constructiva con luz de <Formula math="\lambda = 600 \text{ nm}" />.
             </p>
           </div>
         </TheoryPanel>
 
         {/* Tarjeta 5: Análisis de la Intensidad Luminosa */}
-        <TheoryPanel title="5. Análisis de la Intensidad Luminosa">
+        <TheoryPanel id="intensidad" title="5. Análisis de la Intensidad Luminosa">
           <h3 className="text-lg font-semibold text-slate-50 mb-3">
             Distribución de intensidad en el patrón de interferencia
           </h3>
@@ -649,9 +719,40 @@ export default function TheoryPage() {
 
           <div className="mt-4 rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
             <p className="text-sm text-cyan-300">
-              <strong>💡 Aplicación al simulador:</strong> En el Ejercicio 5 (Distribución de Intensidad), visualizás esta curva <Formula math="\cos^2" /> 
-              en el gráfico de Recharts, con máximos y mínimos marcados, y comparás cómo cambia al modificar <Formula math="d" /> o <Formula math="\lambda" />.
+              <strong>💡 Aplicación al simulador:</strong> En el Ejercicio 5 (Distribución de Intensidad), visualizás esta curva <Formula math="\cos^2" /> en el gráfico interactivo de intensidad en función de la posición, con los máximos (líneas verdes) y mínimos (líneas rojas) marcados, y comparás cómo cambia el patrón al modificar <Formula math="d" /> o <Formula math="\lambda" />.
             </p>
+          </div>
+        </TheoryPanel>
+
+        {/* Tarjeta 6: Teoría de la Cátedra */}
+        <TheoryPanel id="teoria-catedra" title="6. Teoría de la Cátedra">
+          <p className="mb-3 text-slate-300 leading-relaxed">
+            Todo el contenido teórico de este simulador se desarrolló en base a los videos oficiales de la cátedra. 
+            Podés complementar y profundizar los conceptos vistos aquí repasando las explicaciones originales del docente, 
+            donde se desarrollan las fórmulas y se muestran simulaciones y diagramas paso a paso.
+          </p>
+
+          <div className="my-4 space-y-4">
+            <div>
+              <p className="mb-2 text-sm font-semibold text-cyan-400">
+                📺 Primera Parte — Superposición e interferencia
+              </p>
+              <VideoEmbed
+                videoId="zmsvKMjiJZk"
+                title="UT 12 Interferencia — Primera Parte"
+                duration="38:00"
+              />
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-semibold text-cyan-400">
+                📺 Segunda Parte — Distribución de intensidades
+              </p>
+              <VideoEmbed
+                videoId="QQhiJYbZaUU"
+                title="UT 12 Interferencia — Segunda Parte"
+                duration="30:00"
+              />
+            </div>
           </div>
         </TheoryPanel>
       </div>

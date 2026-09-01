@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { VisualizationCanvas } from "../VisualizationCanvas";
+import { VisualizationCanvas } from "../../VisualizationCanvas";
 import { wavelengthToCss } from "@/lib/physics/wavelengthToColor";
 
 interface MinimosProps {
@@ -19,13 +19,10 @@ export function Minimos({
   const LM = screenDistanceM;
   const deltaYM = fringeSpacingMm * 1e-3;
 
-  const lambdaM = useMemo(() => {
-    if (LM === 0) return 0;
-    return (deltaYM * dM) / LM;
-  }, [deltaYM, dM, LM]);
-
+  // Calcular λ a partir de Δy según la fórmula del profesor
+  const lambdaM = LM === 0 ? 0 : (deltaYM * 2 * dM) / (LM * 3);
   const lambdaNm = lambdaM * 1e9;
-  const color = wavelengthToCss(lambdaNm);
+  const color = wavelengthToCss(lambdaNm || 550);
 
   const width = 640;
   const height = 400;
@@ -37,26 +34,32 @@ export function Minimos({
   const waveCount = 8;
   const waves = useMemo(() => {
     const out = [];
+    const visualLambdaNm = lambdaNm > 0 && lambdaNm < 1000 ? lambdaNm : 550;
     for (let i = 1; i <= waveCount; i++) {
-      out.push(i * (lambdaNm / 700) * 18 + 4);
+      out.push(i * (visualLambdaNm / 700) * 18 + 4);
     }
     return out;
   }, [lambdaNm]);
 
-  // Escala dinámica
-  const scalePxPerM = deltaYM > 0 ? (height / 2 - 60) / (deltaYM * 5) : 10000;
+  // Usar directamente deltaYM como la separación entre mínimos
+  const minSpacingM = deltaYM;
+
+  // Escala FIJA basada en valores de referencia para que los mínimos se muevan visualmente
+  // Valores de referencia: Δy_ref = 0.6mm (valor del enunciado)
+  const refDeltaYM = 0.6e-3;
+  const scalePxPerM = refDeltaYM > 0 ? (height / 2 - 60) / (refDeltaYM * 5) : 10000;
 
   const minima = useMemo(() => {
     const items = [];
     for (let m = -5; m <= 4; m++) {
-      const yM = (m + 0.5) * deltaYM;
+      const yM = (m + 0.5) * minSpacingM;
       const yPx = midY - yM * scalePxPerM;
       if (yPx >= 20 && yPx <= height - 20) {
         items.push({ m, yPx, yM });
       }
     }
     return items;
-  }, [deltaYM, midY, height, scalePxPerM]);
+  }, [minSpacingM, midY, height, scalePxPerM]);
 
   const yTopMin = minima.find((m) => m.m === -1);
   const yBottomMin = minima.find((m) => m.m === 0);
@@ -136,10 +139,9 @@ export function Minimos({
 
         {/* Franjas de interferencia (máximos) */}
         {[-2, -1, 0, 1, 2].map((m) => {
-          const yM = m * deltaYM;
-          const yPx = midY - yM * 10000;
+          const yM = m * minSpacingM;
+          const yPx = midY - yM * scalePxPerM;
           if (yPx < 20 || yPx > height - 20) return null;
-          const intensity = Math.cos((Math.PI * dM * yM) / (lambdaM * LM)) ** 2;
           return (
             <line
               key={`max-${m}`}
@@ -148,8 +150,8 @@ export function Minimos({
               x2={screenX + 12}
               y2={yPx}
               stroke={color}
-              strokeWidth={2 + intensity * 4}
-              opacity={0.3 + intensity * 0.7}
+              strokeWidth={3}
+              opacity={0.6}
             />
           );
         })}

@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
 
-import { createClient } from "@/lib/supabase/client";
-
 interface VisitCounterProps {
   pagePath: string;
 }
@@ -16,22 +14,21 @@ export function VisitCounter({ pagePath }: VisitCounterProps) {
     let cancelled = false;
 
     async function fetchCount() {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("page_visit_counts")
-        .select("visit_count")
-        .eq("page_path", pagePath)
-        .maybeSingle();
-
-      if (cancelled) return;
-
-      if (error) {
+      try {
+        const response = await fetch("/api/visits/stats");
+        if (!response.ok) {
+          setCount(null);
+          return;
+        }
+        const data = (await response.json()) as {
+          byPage?: Record<string, number>;
+        };
+        if (cancelled) return;
+        setCount(data.byPage?.[pagePath] ?? 0);
+      } catch (error) {
         console.error("VisitCounter fetch failed:", error);
-        setCount(null);
-        return;
+        if (!cancelled) setCount(null);
       }
-
-      setCount(data?.visit_count ?? 0);
     }
 
     fetchCount();

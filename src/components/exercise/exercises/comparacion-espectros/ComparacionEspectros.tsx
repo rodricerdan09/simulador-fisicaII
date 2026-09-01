@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { VisualizationCanvas } from "../VisualizationCanvas";
+import { VisualizationCanvas } from "../../VisualizationCanvas";
 import { wavelengthToCss } from "@/lib/physics/wavelengthToColor";
 
 interface ComparacionEspectrosProps {
@@ -9,7 +9,8 @@ interface ComparacionEspectrosProps {
   lambda2Nm: number;
   slitDistanceMm: number;
   screenDistanceM: number;
-  orderM: number;
+  orderM1: number;
+  orderM2: number;
 }
 
 export function ComparacionEspectros({
@@ -17,7 +18,8 @@ export function ComparacionEspectros({
   lambda2Nm,
   slitDistanceMm,
   screenDistanceM,
-  orderM,
+  orderM1,
+  orderM2,
 }: ComparacionEspectrosProps) {
   const lambda1M = lambda1Nm * 1e-9;
   const lambda2M = lambda2Nm * 1e-9;
@@ -26,13 +28,13 @@ export function ComparacionEspectros({
 
   const y1M = useMemo(() => {
     if (dM === 0) return 0;
-    return (orderM * lambda1M * LM) / dM;
-  }, [orderM, lambda1M, LM, dM]);
+    return (orderM1 * lambda1M * LM) / dM;
+  }, [orderM1, lambda1M, LM, dM]);
 
   const y2M = useMemo(() => {
     if (dM === 0) return 0;
-    return (orderM * lambda2M * LM) / dM;
-  }, [orderM, lambda2M, LM, dM]);
+    return (orderM2 * lambda2M * LM) / dM;
+  }, [orderM2, lambda2M, LM, dM]);
 
   const color1 = wavelengthToCss(lambda1Nm);
   const color2 = wavelengthToCss(lambda2Nm);
@@ -159,7 +161,7 @@ export function ComparacionEspectros({
           strokeWidth={1}
         />
 
-        {/* Franja de orden m para λ1 */}
+        {/* Franja de orden m1 para λ1 */}
         {y1Px > 20 && y1Px < height - 20 && (
           <>
             <line
@@ -174,14 +176,14 @@ export function ComparacionEspectros({
             <text
               x={screenX + 35}
               y={y1Px + 4}
-              style={{ fontSize: "18px", fill: color1 }}
+              style={{ fontSize: "17px", fill: color1 }}
             >
-              λ₁
+              λ₁(m={orderM1})
             </text>
           </>
         )}
 
-        {/* Franja de orden m para λ2 */}
+        {/* Franja de orden m2 para λ2 */}
         {y2Px > 20 && y2Px < height - 20 && (
           <>
             <line
@@ -196,9 +198,9 @@ export function ComparacionEspectros({
             <text
               x={screenX + 35}
               y={y2Px + 4}
-              style={{ fontSize: "18px", fill: color2 }}
+              style={{ fontSize: "17px", fill: color2 }}
             >
-              λ₂
+              λ₂(m={orderM2})
             </text>
           </>
         )}
@@ -226,7 +228,7 @@ export function ComparacionEspectros({
         </text>
       </svg>
 
-      <div className="mt-4 grid w-full grid-cols-2 gap-3 text-center text-xs text-slate-400 sm:grid-cols-5">
+      <div className="mt-4 p-1 grid w-full grid-cols-2 gap-3 text-center text-xs text-slate-400 sm:grid-cols-4">
         <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
           <p className="text-slate-500">λ₁</p>
           <p className="font-mono" style={{ color: color1 }}>{lambda1Nm} nm</p>
@@ -244,8 +246,12 @@ export function ComparacionEspectros({
           <p className="font-mono text-cyan-400">{screenDistanceM.toFixed(2)} m</p>
         </div>
         <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
-          <p className="text-slate-500">m</p>
-          <p className="font-mono text-cyan-400">{orderM}</p>
+          <p className="text-slate-500">m₁</p>
+          <p className="font-mono text-cyan-400">{orderM1}</p>
+        </div>
+        <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-2">
+          <p className="text-slate-500">m₂</p>
+          <p className="font-mono text-cyan-400">{orderM2}</p>
         </div>
       </div>
     </VisualizationCanvas>
@@ -257,16 +263,16 @@ export function computeComparacionEspectros(
   lambda2Nm: number,
   slitDistanceMm: number,
   screenDistanceM: number,
-  orderM: number
+  orderM1: number,
+  orderM2: number
 ) {
   const lambda1 = lambda1Nm * 1e-9;
   const lambda2 = lambda2Nm * 1e-9;
   const d = slitDistanceMm * 1e-3;
   const L = screenDistanceM;
-  const m = orderM;
 
-  const y1 = (m * lambda1 * L) / d;
-  const y2 = (m * lambda2 * L) / d;
+  const y1 = (orderM1 * lambda1 * L) / d;
+  const y2 = (orderM2 * lambda2 * L) / d;
   const deltaY = Math.abs(y2 - y1);
 
   return [
@@ -274,10 +280,10 @@ export function computeComparacionEspectros(
     { label: "λ₁ (Nanómetros)", value: lambda1Nm, unit: "nm", precision: 0 },
     { label: "λ₂ (Notación Científica)", value: lambda2, unit: "m", precision: 4, scientific: true },
     { label: "λ₂ (Nanómetros)", value: lambda2Nm, unit: "nm", precision: 0 },
-    { label: "y₁ (posición franja λ₁)", value: y1, unit: "m", precision: 4, scientific: true },
-    { label: "y₁ (posición franja λ₁)", value: y1 * 1000, unit: "mm", precision: 2 },
-    { label: "y₂ (posición franja λ₂)", value: y2, unit: "m", precision: 4, scientific: true },
-    { label: "y₂ (posición franja λ₂)", value: y2 * 1000, unit: "mm", precision: 2 },
+    { label: `y₁ (posición franja λ₁, m=${orderM1})`, value: y1, unit: "m", precision: 4, scientific: true },
+    { label: `y₁ (posición franja λ₁, m=${orderM1})`, value: y1 * 1000, unit: "mm", precision: 2 },
+    { label: `y₂ (posición franja λ₂, m=${orderM2})`, value: y2, unit: "m", precision: 4, scientific: true },
+    { label: `y₂ (posición franja λ₂, m=${orderM2})`, value: y2 * 1000, unit: "mm", precision: 2 },
     { label: "Separación Δy (Notación Científica)", value: deltaY, unit: "m", precision: 4, scientific: true },
     { label: "Separación Δy (Milímetros)", value: deltaY * 1000, unit: "mm", precision: 2 },
   ];
