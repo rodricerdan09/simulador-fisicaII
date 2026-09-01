@@ -48,6 +48,8 @@ export async function POST(request: Request) {
           legajo: alumno.legajo,
           nombre: alumno.nombre,
           apellido: alumno.apellido,
+          carrera: alumno.carrera,
+          comision: alumno.comision,
           alumnoId: alumno.id,
         },
       });

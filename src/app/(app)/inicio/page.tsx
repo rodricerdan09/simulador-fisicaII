@@ -3,6 +3,7 @@ import { BrainCircuit, Waves, Layers, ScanLine, Sun, Rainbow, BookOpen, Lightbul
 
 import { EXERCISES } from "@/constants/exercises";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EncuestaCard } from "@/components/layout/EncuestaCard";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   waves: Waves,
@@ -79,6 +80,9 @@ export default function InicioPage() {
           </div>
         </div>
       </section>
+
+      {/* Encuesta de Satisfacción */}
+      <EncuestaCard />
 
       {/* Sección de Ejercicios */}
       <section className="space-y-4">

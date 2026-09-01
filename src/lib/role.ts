@@ -5,6 +5,8 @@ export interface Sesion {
   legajo?: string;
   nombre?: string;
   apellido?: string;
+  carrera?: string;
+  comision?: string;
   alumnoId?: number;
 }
 
