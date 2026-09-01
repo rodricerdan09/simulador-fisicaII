@@ -54,7 +54,7 @@ export default function AccesoPage() {
       const body =
         loginMode === "alumno"
           ? { type: "alumno" as const, legajo: loginLegajo, apellido: loginApellido }
-          : { type: "profesor" as const, code: loginCode };
+          : { type: "profesor" as const, code: loginCode, apellido: loginApellido };
 
       const response = await fetch("/api/login", {
         method: "POST",
@@ -251,17 +251,29 @@ export default function AccesoPage() {
                 </div>
               </>
             ) : (
-              <div className="space-y-1.5">
-                <Label htmlFor="code">Código Docente</Label>
-                <Input
-                  id="code"
-                  type="password"
-                  value={loginCode}
-                  onChange={(e) => setLoginCode(e.target.value)}
-                  placeholder="Ingrese el código docente"
-                  required
-                />
-              </div>
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-apellido">Apellido</Label>
+                  <Input
+                    id="login-apellido"
+                    value={loginApellido}
+                    onChange={(e) => setLoginApellido(e.target.value)}
+                    placeholder="Tu apellido"
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="code">Código Docente</Label>
+                  <Input
+                    id="code"
+                    type="password"
+                    value={loginCode}
+                    onChange={(e) => setLoginCode(e.target.value)}
+                    placeholder="Ingrese el código docente"
+                    required
+                  />
+                </div>
+              </>
             )}
 
             {error && <p className="text-sm text-red-400">{error}</p>}
